@@ -8,7 +8,8 @@
     <script tyle="text/javascript" src="/lib/reflection/reflection.js"></script>
   </head>
   <body ondragover="return false">
-    <audio id=player src="<?php echo "/".$song_path; ?>" preload=auto autoplay>Opps! This browser may be did not support for html5 audio tags</audio>
+    <audio id=player src="/ui/player/request_music.php?id=<?php echo $_GET['id']; ?>" preload=auto autoplay>Opps! This browser may be did not support for html5 audio tags</audio>
+    <!-- <audio id=player src="<?php echo "/".$song_path; ?>" preload=auto autoplay>Opps! This browser may be did not support for html5 audio tags</audio> -->
     <img id="aart" class="shimmer" src="<?php echo $aart_src; ?>">
     <div id="easy_loc" style="position:fixed;top:0;left:0;height:calc(100% - 180px);width:100%;margin:0;padding:0;"></div>
     <div>

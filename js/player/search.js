@@ -4,7 +4,10 @@ $(document).ready(function(){$("#altable").tablesorter();$("#artable").tablesort
 function toggleExpand(t) {
   for (var i=0; i<3; i++) {
     var t = t.parentNode;
-    if (t.className == 'hide') {
+    if (t.className == 'show') {
+      t.className = 'hide';
+      break;
+    } else if (t.className == 'hide') {
       t.className = 'show';
       break;
     }
