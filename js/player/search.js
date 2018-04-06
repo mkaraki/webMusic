@@ -7,9 +7,6 @@ function toggleExpand(t) {
     if (t.className == 'hide') {
       t.className = 'show';
       break;
-    } else if (t.className == 'show') {
-      t.className = 'hide';
-      break;
     }
   }
 }
@@ -17,8 +14,8 @@ function toggleExpand(t) {
 function initExpand() {
   var e = document.getElementsByTagName('*');
   for (var i=0; i<e.length; i++) {
-    if (e[i].className == 'show') {
-      e[i].className = 'hide';
+    if (e[i].className == 'hide') {
+      e[i].className = 'show';
     }
     if (e[i].className == 'trigger') {
       e[i].setAttribute('onclick',   'toggleExpand(this)');
