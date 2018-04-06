@@ -40,7 +40,7 @@ function main_p(){
 
   while ($meat = $songinfo->fetchArray()) {
     $song_name=$meat['name'];
-    $song_path=$meat['path'];
+    $song_id=$meat['id'];
     $getID3 = new getID3();
     $fI = $getID3->analyze(dirname(__FILE__)."/../../../$song_path");
     getid3_lib::CopyTagsToComments($fI);

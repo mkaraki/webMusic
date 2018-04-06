@@ -13,7 +13,7 @@ main_p();
     <script tyle="text/javascript" src="/lib/reflection/reflection.js"></script>
   </head>
   <body ondragover="return false">
-    <audio id=player src="<?php echo "/".$song_path; ?>" preload=auto autoplay>Opps! This browser may be did not support for html5 audio tags</audio>
+    <audio id=player src="/ui/player/request_music.php?id=<?php echo $song_id; ?>" preload=auto autoplay>Opps! This browser may be did not support for html5 audio tags</audio>
     <script>player.volume=Number(docCookies.getItem("volume"));plock=false;init_loop();</script>
     <img id="aart" class="simmer" src="<?php echo $aart_src; ?>">
     <div id="media_info">

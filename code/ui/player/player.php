@@ -5,7 +5,6 @@ require_once(dirname(__FILE__).'/../../../lib/getid3/getid3.php');
 $songinfo=$sql_host->query("SELECT * FROM song where id = ".$_GET['id']);
 while ($meat = $songinfo->fetchArray()) {
   $song_name=$meat['name'];
-  $song_path=$meat['path'];
   $getID3 = new getID3();
   $fI = $getID3->analyze(dirname(__FILE__)."/../../../$song_path");
   getid3_lib::CopyTagsToComments($fI);
