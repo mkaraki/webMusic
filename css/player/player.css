@@ -1,0 +1,61 @@
+html{
+  height:100%;width:100%;margin:0;padding:0;
+  background:radial-gradient(rgb(50,50,50),#010101)fixed;
+  color:white;
+  overflow: hidden;
+}
+body{
+  height:100%;width:100%;margin:0;padding:0;
+  text-align:center;
+}
+#aart{
+  margin:auto auto;
+  margin-top:10px;
+  height:calc(100% - 200px);
+}
+#control{
+  position:fixed;
+  height:60px;
+  bottom:30px;
+  left:calc(50% - 128px);
+}
+button {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+#seekbar{
+  height: 2px;
+  margin-bottom: 0px;
+  overflow: hidden;
+  position: fixed;
+  bottom:0px;
+  width: 100%;
+}
+#seekbar span{
+  background-color: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0px;
+}
+#seekbarbf{
+  height: 2px;
+  margin-bottom: 0px;
+  overflow: hidden;
+  position: fixed;
+  bottom:0px;
+  width: 100%;
+}
+a {
+color:white;
+}
+#seekbarbf span{
+  background-color: #3d3d3d;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0px;
+}
