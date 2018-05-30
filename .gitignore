@@ -1,4 +1,3 @@
-#hide copyrighted
 music/
 *.log
 *.pid
@@ -6,3 +5,5 @@ apache_setting.conf
 /db/library.db
 /src/img/play_control
 /src/img/aart/no_art.svg
+/tools
+/.vs

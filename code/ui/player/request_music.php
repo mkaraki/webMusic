@@ -10,11 +10,10 @@ if ($music_path==""){die("e0");}
 if (!file_exists(dirname(__FILE__)."/../../../".$music_path)){die("e1");}
 
 $getID3 = new getID3();
-$getID3->analyze(dirname(__FILE__)."/../../../$music_path");
+$fI = $getID3->analyze(dirname(__FILE__)."/../../../$music_path");
+getid3_lib::CopyTagsToComments($fI);
 
-if (isset($getID3->info['mime_type'])) {$mime = $getID3->info['mime_type'];}else{$mime = "application/octet-stream";}
+if (isset($fI['mime_type'])) {$mime = $fI['mime_type'];}else{$mime = "application/octet-stream";}
 
-header("Content-Type: $mime");
-header("Content-Disposition: attachment; filename=".basename("./file/".$_GET['id']));
-readfile(dirname(__FILE__)."/../../../".$music_path);
+$music_full_path = dirname(__FILE__)."/../../../".$music_path;
 ?>
