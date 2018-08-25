@@ -102,4 +102,3 @@ setInterval(function (){
     var buffpercentage = ( (player.buffered.end(0)) / player.duration ) * 100;
     $("#seekbarbf span").css("width", buffpercentage+"%");
 },1000/60);
-
