@@ -5,8 +5,13 @@ html, body {
     color: white;
 }
 
-.playing-coverart {
+.queue-controller {
     height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+.playing-coverart {
+    height: 100%;
     z-index: 0;
     position: relative;
 }
@@ -39,4 +44,22 @@ html, body {
     width: 100vw;
     bottom: 0;
     background-color: black;
+}
+
+.controller-playback-position-holder {
+    height: 5px;
+    width: 100vw;
+    background-color: #777;
+    cursor: pointer;
+}
+
+
+.controller-playback-position-holder:hover {
+    height: 15px;
+}
+
+.controller-playback-position-indicator {
+    height: 100%;
+    width: 0%;
+    background-color: #E33;
 }

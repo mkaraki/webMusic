@@ -16,23 +16,38 @@
 </head>
 
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12 col-lg-6">
-                <div class="playing-coverart d-flex justify-content-center align-items-center">
-                    <img src="https://coverartarchive.org/release/2e2be0e2-23c0-4e2b-b821-d63c17149fec/33571457168.jpg"
-                        alt="Coverart" class="img-fluid">
+    <div class="queue-controller">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <div class="playing-coverart d-flex justify-content-center align-items-center">
+                        <img src="https://coverartarchive.org/release/2e2be0e2-23c0-4e2b-b821-d63c17149fec/33571457168.jpg"
+                            alt="Coverart" class="img-fluid">
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-12 col-lg-6">
-
+                <div class="col-12 col-lg-6">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Playlist</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Lyric</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
+
     <div class="controller">
+        <div class="controller-playback-position-holder">
+            <div class="controller-playback-position-indicator" style="width: 80%;"></div>
+        </div>
     </div>
+
+    <script src="script.js"></script>
 </body>
 
 </html>

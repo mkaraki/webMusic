@@ -1,0 +1,8 @@
+{
+    "require": {
+        "league/color-extractor": "^0.1.0",
+        "klein/klein": "^2.1",
+        "sergeytsalkov/meekrodb": "^2.4",
+        "aminyazdanpanah/php-ffmpeg-video-streaming": "^1.2"
+    }
+}
