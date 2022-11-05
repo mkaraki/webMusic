@@ -58,19 +58,55 @@ html, body {
 }
 
 .controller-playback-position-holder {
-    height: 5px;
-    width: 100vw;
-    background-color: #777;
+    height: 15px;
+    padding-bottom: 13px;
     cursor: pointer;
 }
 
+.controller-playback-position-view {
+    height: 100%;
+    width: 100vw;
+    background-color: #777;
+}
 
 .controller-playback-position-holder:hover {
-    height: 15px;
+    padding-bottom: 0;
 }
 
 .controller-playback-position-indicator {
     height: 100%;
     width: 0%;
     background-color: #E33;
+}
+
+.controller-playback-mediainfo-holder {
+    height: 85px;
+    padding: 5px;
+}
+
+.controller-playback-mediainfo-holder>div {
+    float: left;
+}
+
+.controller-playback-mediainfo-image-holder {
+    height: 100%;
+    margin-right: 15px;
+}
+.controller-playback-mediainfo-image-holder img {
+    height: 100%;
+}
+
+.controller-playback-mediainfo-text-holder p {
+    margin: 0;
+}
+
+.controller-playback-mediainfo-title {
+    color: white;
+    font-size: x-large;
+}
+
+.controller-playback-mediainfo-album,
+.controller-playback-mediainfo-artist {
+    font-size: smaller;
+    color: darkgray
 }
