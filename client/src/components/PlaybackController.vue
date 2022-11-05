@@ -1,21 +1,43 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { inject, ref, watch } from 'vue'
+import mitt from 'mitt'
+import { emitter } from '../emitter';
+import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 
-defineProps<{
-    title: string,
-    album: string,
-    artist: string,
-    src: string,
-    coverurl: string,
-    covercolor: string,
-}>()
+const emit = defineEmits(['togglePlaybackQueue']);
 
 const pos = ref(0.0);
 
-const player = new Audio('http://localhost:8080/library/1/track/1/file');
+const title = ref('');
+const albumName = ref('');
+const albumMbid = ref('');
+const artistMap = ref([]);
+const coverurl = ref('');
+const covercolor = ref('#999');
+
+const player = new Audio();
 player.ontimeupdate = function () { 
     pos.value = player.currentTime / player.duration;
 }
+
+emitter.on('newTrackSelected', (t) => {
+    const baseurl = 'http://localhost:8080/library/1/track/' + t;
+    fetch(baseurl)
+        .then(response => response.json())
+        .then(res => { 
+            title.value = res['title'];
+            albumName.value = res['albumName'];
+            albumMbid.value = res['releaseMbid'];
+            artistMap.value = res['artist'];
+            player.src = baseurl + '/file';
+            coverurl.value = res['artworkUrl'];
+            covercolor.value = '#' + (res['artworkColor'] ?? '999');
+            pos.value = 0;
+            player.play();
+
+            emitter.emit<any>('gotPlayingInformation', res);
+        });
+});
 
 function togglePlaybackStete() { 
   if (player.paused || player.ended)
@@ -47,16 +69,17 @@ function controller_playback_position_click(event: any) {
                 </div>
                 <div class="controller-playback-mediainfo-text-holder">
                     <p class="controller-playback-mediainfo-title">{{ title }}</p>
-                    <p class="controller-playback-mediainfo-album">{{ album }}</p>
-                    <p class="controller-playback-mediainfo-artist">{{ artist }}</p>
+                    <p class="controller-playback-mediainfo-album">{{ albumName }}</p>
+                    <p class="controller-playback-mediainfo-artist">
+                        <artist-map-to-linked-text :artists="artistMap"></artist-map-to-linked-text>
+                    </p>
                 </div>
             </div>
             <div class="controller-playback-control-holder">
                 <div class="controller-playback-control-volume-control">
                     <div class="controller-playback-control-volume-holder">
                         <input type="range" max="1" min="0" step="0.02"
-                            v-bind:value="player.volume"
-                            v-on:input="(e) => player.volume = e.target.value">
+                            v-model="player.volume" />
                     </div>
                     <button class="controller-playback-control-button controller-playback-control-volume-button"
                         v-on:click="player.muted = !player.muted">
@@ -72,6 +95,10 @@ function controller_playback_position_click(event: any) {
                         <i v-if="!(player.paused || player.ended)" class="bi bi-pause"></i>
                         <i v-else class="bi bi-play-fill"></i>
                     </button>
+                    <button class="controller-playback-control-button"
+                        v-on:click="emit('togglePlaybackQueue')">
+                        <i class="bi bi-list"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -81,7 +108,7 @@ function controller_playback_position_click(event: any) {
 <style scoped>
 .controller-playback-position-holder {
     height: 15px;
-    padding-bottom: 13px;
+    padding-bottom: 10px;
     cursor: pointer;
 }
 

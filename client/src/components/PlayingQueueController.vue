@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import { emitter } from "../emitter";
+
+defineProps<{
+    coverUrl: string,
+}>()
+
 </script>
 
 <template>
@@ -6,7 +13,7 @@
         <div class="row">
             <div class="col-12 col-lg-6">
                 <div class="playing-coverart d-flex justify-content-center align-items-center">
-                    <img src="https://coverartarchive.org/release/2e2be0e2-23c0-4e2b-b821-d63c17149fec/33571457168.jpg"
+                    <img :src="coverUrl"
                         alt="Coverart" class="img-fluid">
                 </div>
             </div>
@@ -41,7 +48,6 @@
 
 .playing-coverart:before  {
     content: '';
-    background-image: url('https://coverartarchive.org/release/2e2be0e2-23c0-4e2b-b821-d63c17149fec/33571457168.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center center;

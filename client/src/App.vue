@@ -2,25 +2,31 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import { Ref, ref, provide } from 'vue';
-import HelloWorld from './components/HelloWorld.vue'
 import PlaybackController from './components/PlaybackController.vue'
 import PlayingQueueController from './components/PlayingQueueController.vue';
+import MusicSelectorTrack from './components/MusicSelectorTrack.vue';
+import { emitter } from './emitter';
 
-const pos: Ref<number> = ref(0);
+const displayPlaybackQueue = ref(false);
 
+const coverUrl = ref('');
+
+emitter.on('gotPlayingInformation', (i: any) => {
+    coverUrl.value = i['artworkUrl'];
+});
 
 </script>
 
 <template>
   <div class="queue-controller">
-    <playing-queue-controller></playing-queue-controller>
+    <playing-queue-controller v-if="displayPlaybackQueue"
+      :coverUrl="coverUrl"></playing-queue-controller>
+    <music-selector-track v-else></music-selector-track>
   </div>
 
   <div class="controller">
-    <playback-controller title="Track 1" artist="Isekaijoucho" album="Anima"
-      coverurl="https://coverartarchive.org/release/2e2be0e2-23c0-4e2b-b821-d63c17149fec/front" covercolor="#999"
-      src="http://localhost:8080/library/1/track/1/file"
-      v-bind:position="pos"
+    <playback-controller 
+      v-on:toggle-playback-queue="displayPlaybackQueue = !displayPlaybackQueue"
       ></playback-controller>
   </div>
 </template>
