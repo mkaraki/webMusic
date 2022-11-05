@@ -127,6 +127,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/file', function 
     $fptr = fopen($fp, 'rb');
 
     $response->header("Content-type", $fmime);
+    $response->header('Access-Control-Allow-Origin', '*');
 
     if (isset($request->headers()['Range'])) {
         $range = explode('=', $request->headers()['Range']);
