@@ -7,7 +7,9 @@ import { emitter } from '../emitter';
 let items = ref([]);
 
 function addItemsRecursive(baseurl: string, url: string) {
-    fetch(baseurl + url)
+    fetch(baseurl + url, {
+        credentials: 'include'
+    })
         .then(response => response.json())
         .then(res => {
             items.value = items.value.concat(res['result'])

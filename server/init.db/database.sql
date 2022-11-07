@@ -1,7 +1,13 @@
 CREATE TABLE IF NOT EXISTS user(
     id INT PRIMARY KEY AUTO_INCREMENT,
-    username TEXT,
+    username VARCHAR(256) NOT NULL UNIQUE,
     passhash TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS sessionToken(
+    token CHAR(64) PRIMARY KEY,
+    userid INT NOT NULL,
+    expire DATETIME NOT NULL,
+    FOREIGN KEY (userid) REFERENCES user(id)
 );
 CREATE TABLE IF NOT EXISTS library(
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -9,10 +15,11 @@ CREATE TABLE IF NOT EXISTS library(
 );
 CREATE TABLE IF NOT EXISTS accessList(
     id INT PRIMARY KEY AUTO_INCREMENT,
-    username TEXT NOT NULL,
+    userid INT NOT NULL,
     libraryId INT NOT NULL,
     permission INT DEFAULT(5),
-    FOREIGN KEY(libraryId) REFERENCES library(id)
+    FOREIGN KEY(libraryId) REFERENCES library(id),
+    FOREIGN KEY (userid) REFERENCES user(id)
 );
 CREATE TABLE IF NOT EXISTS artistMetadata(
     mbid CHAR(36) PRIMARY KEY,

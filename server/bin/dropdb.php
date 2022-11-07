@@ -4,6 +4,7 @@ require_once __DIR__ . '/../_config.php';
 
 $target_tables = [
     'user',
+    'sessionToken',
     'library',
     'accessList',
     'artistMetadata',

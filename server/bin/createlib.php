@@ -17,8 +17,8 @@ if (count($q) > 0) {
     die('Library with specified directory already exists');
 }
 
-DB::insert('library', [
+$istres = DB::insert('library', [
     'basepath' => $dir,
 ]);
 
-print("Library added.\n");
+print('Library added. Id: ' . $istres['id'] . "\n");
