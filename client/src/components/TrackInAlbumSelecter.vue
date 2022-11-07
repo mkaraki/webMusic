@@ -7,16 +7,6 @@ defineProps<{
     album: any,
 }>()
 
-const detailedAlbumInfo: Ref<any> = ref(null);
-
-function fetchAlbumDetailedInfo(album: any) { 
-    fetch('http://localhost:8080/' + 'library/1/album/' + album['mbid'])
-        .then(response => response.json)
-        .then(r => {
-            detailedAlbumInfo.value = r;
-        });
-}
-
 </script>
 
 <template>
@@ -32,13 +22,12 @@ function fetchAlbumDetailedInfo(album: any) {
                         <artist-map-to-linked-text :artists="album['artist']"></artist-map-to-linked-text>
                     </p>
                     <div>
-                        <div v-if="detailedAlbumInfo === null" v-on:load="fetchAlbumDetailedInfo(album)">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                        <div>
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action" v-for="track in album['track']" :key="track['id']">
+                                    {{track['title']}}
+                                </a>
                             </div>
-                        </div>
-                        <div v-else>
-
                         </div>
                     </div>
                 </div>

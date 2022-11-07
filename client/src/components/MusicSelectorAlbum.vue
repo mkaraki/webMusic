@@ -3,6 +3,7 @@ import { onMounted, ref, provide } from 'vue'
 import axios from 'axios';
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 import TrackInAlbumSelecter from './TrackInAlbumSelecter.vue';
+import Loading from './Loading.vue'
 import { emitter } from '../emitter';
 
 let items = ref([]);
@@ -27,21 +28,39 @@ function sendSelectedTrackInfo(trackId: number) {
     emitter.emit<any>('newTrackSelected', trackId)
 }
 
+
+const loading = ref(false);
 const inspectingAlbum = ref(null);
+
+function selectInspectItem(item: any) { 
+    loading.value = true;
+    fetch('http://localhost:8080/' + 'library/1/album/' + item['mbid'], {
+        credentials: 'include'
+    })
+        .then(response => response.json)
+        .then(r => {
+            item['track'] = r;
+            inspectingAlbum.value = item;
+        })
+        .finally(() => { 
+            loading.value = false;
+        });
+}
 
 </script>
 
 <template>
-    <div class="container-fluid" v-if="inspectingAlbum === null">
+    <loading v-if="loading"></loading>
+    <div class="container-fluid" v-else-if="inspectingAlbum === null">
         <div class="row g-4">
             <div class="col" v-for="item in items" :key="item['mbid']">
                 <div class="card h-100">
-                    <a v-on:click="inspectingAlbum = item">
+                    <a v-on:click="selectInspectItem(item)">
                         <img :src="item['artworkUrl']" class="card-img-top" :alt="item['albumName']">
                     </a>
                     <div class="card-body">
                         <h5 class="card-title cut-overflow card-album">
-                            <a v-on:click="inspectingAlbum = item">
+                            <a v-on:click="selectInspectItem(item)">
                                 {{ item['albumName'] }}
                             </a>
                         </h5>

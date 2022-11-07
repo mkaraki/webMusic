@@ -22,11 +22,15 @@ function loginAndExtendTokenExpire(string $token): null|int
 
 function loginAndExtendTokenExpireWithKlein($request, $response): null|int
 {
-    if ($request->cookies() === null)
+    if ($request->cookies() === null) {
+        $response->code(401);
         return null;
+    }
 
-    if (!isset($request->cookies()['auth']))
+    if (!isset($request->cookies()['auth'])) {
+        $response->code(401);
         return null;
+    }
 
     $loggedUser = loginAndExtendTokenExpire($request->cookies()['auth']);
     if ($loggedUser === null) {

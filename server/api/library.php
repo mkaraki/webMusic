@@ -190,6 +190,48 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/file', function 
     }
 });
 
+$klein->respond('GET', '/library/[i:libraryId]/album/[:mbid]', function ($request, $response) {
+    $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
+    if ($loggedUser === null) return;
+    if (!checkUserHavePermissionToReadLibrary($loggedUser, $request->libraryId)) {
+        $response->code(403);
+        return;
+    }
+
+    $tracks = DB::query(
+        'SELECT
+            track.id AS id,
+            tM.trackMbid AS mbid,
+            tM.title AS title,
+            tM.duration AS duration,
+            tM.diskNo AS diskNo,
+            tM.trackNo AS trackNo
+            FROM
+                track track,
+                trackMetadata tM
+            WHERE
+                track.libraryId = %i AND
+                track.trackMbid = tM.trackMbid AND
+                tM.releaseMbid = %s
+            ORDER BY diskNo, trackNo',
+        $request->libraryId,
+        $request->mbid
+    );
+
+    for ($i = 0; $i < count($tracks); $i++) {
+        $res[$i]['artist'] = DB::query(
+            'SELECT mapNo AS sequence, artistMbid, dispName, joinPhrase
+                FROM artistMap
+                WHERE trackMbid = %s
+                ORDER BY mapNo',
+            $tracks[$i]['mbid']
+        );
+    }
+
+    setCors($request, $response);
+    $response->json($tracks);
+});
+
 
 $klein->respond('GET', '/library/[i:libraryId]/album', function ($request, $response) {
     $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
@@ -237,45 +279,4 @@ $klein->respond('GET', '/library/[i:libraryId]/album', function ($request, $resp
 
     setCors($request, $response);
     $response->json($ret);
-});
-
-$klein->respond('GET', '/library/[i:libraryId]/album/[:mbid]', function ($request, $response) {
-    $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
-    if ($loggedUser === null) return;
-    if (!checkUserHavePermissionToReadLibrary($loggedUser, $request->libraryId)) {
-        $response->code(403);
-        return null;
-    }
-
-
-    $tracks = DB::query(
-        'SELECT
-            track.id AS id,
-            tM.trackMbid AS mbid,
-            tM.title AS title,
-            tM.duration AS duration,
-            tM.diskNo AS diskNo,
-            tM.trackNo AS trackNo,
-            FROM
-                track track,
-                trackMetadata tM,
-            WHERE
-                track.libraryId = %i AND
-                track.trackMbid = tM.trackMbid AND
-                tM.releaseMbid = %s
-            ORDER BY diskNo, trackNo
-            LIMIT %i, 51',
-        $request->libraryId,
-        $request->mbid
-    );
-
-    for ($i = 0; $i < count($tracks); $i++) {
-        $res[$i]['artist'] = DB::query(
-            'SELECT mapNo AS sequence, artistMbid, dispName, joinPhrase
-                FROM artistMap
-                WHERE trackMbid = %s
-                ORDER BY mapNo',
-            $tracks[$i]['mbid']
-        );
-    }
 });
