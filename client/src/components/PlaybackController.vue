@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { inject, ref, watch } from 'vue'
-import mitt from 'mitt'
+import { onMounted, ref } from 'vue'
 import { emitter } from '../emitter';
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 
@@ -53,6 +52,16 @@ function controller_playback_position_click(event: any) {
     player.currentTime = player.duration * newPos;
 }
 
+onMounted(() => {
+    const savedValue = localStorage.getItem('playerVolume') ?? '1';
+    player.volume = parseFloat(savedValue);
+});
+
+
+function saveVolume(event: any) { 
+    const volume = event.target.value;
+    localStorage.setItem('playerVolume', volume);
+}
 </script>
 
 <template>
@@ -81,7 +90,8 @@ function controller_playback_position_click(event: any) {
                 <div class="controller-playback-control-volume-control">
                     <div class="controller-playback-control-volume-holder">
                         <input type="range" max="1" min="0" step="0.02"
-                            v-model="player.volume" />
+                            v-model="player.volume"
+                            v-on:change="saveVolume"/>
                     </div>
                     <button class="controller-playback-control-button controller-playback-control-volume-button"
                         v-on:click="player.muted = !player.muted">
