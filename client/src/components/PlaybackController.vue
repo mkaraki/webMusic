@@ -22,7 +22,9 @@ player.ontimeupdate = function () {
 
 emitter.on('newTrackSelected', (t) => {
     const baseurl = 'http://localhost:8080/library/1/track/' + t;
-    fetch(baseurl)
+    fetch(baseurl, {
+        credentials: 'include'
+    })
         .then(response => response.json())
         .then(res => { 
             title.value = res['title'];

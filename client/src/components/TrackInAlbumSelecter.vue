@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 import { onMounted, Ref, ref } from 'vue'
+import SecondToTimeFormat from './SecondToTimeFormat.vue';
 
+import { emitter } from '../emitter';
 
 defineProps<{
     album: any,
 }>()
+
+function sendSelectedTrackInfo(trackId: number) { 
+    emitter.emit<any>('newTrackSelected', trackId)
+}
 
 </script>
 
@@ -18,16 +24,34 @@ defineProps<{
                 </div>
                 <div class="col-12 col-md-8 content-info">
                     <h2>{{ album['albumName'] }}</h2>
-                    <p>
+                    <p class="artist-information-holder">
                         <artist-map-to-linked-text :artists="album['artist']"></artist-map-to-linked-text>
                     </p>
                     <div>
-                        <div>
-                            <div class="list-group">
-                                <a href="#" class="list-group-item list-group-item-action" v-for="track in album['track']" :key="track['id']">
-                                    {{track['title']}}
-                                </a>
-                            </div>
+                        <div class="list-group">
+                            <a href="#" class="list-group-item list-group-item-action"
+                                v-for="track in album['track']" :key="track['mbid']"
+                                v-on:click="sendSelectedTrackInfo(track['id']);">
+                                <div class="d-flex justify-content-between align-items-start w-100">
+                                    <div class="me-auto track-information-holder">
+                                        <div class="track-no-information-holder">
+                                            <span v-if="track['diskNo'] > 0">{{ track['diskNo'] }}</span>
+                                            <span v-if="track['diskNo'] > 0 && track['trackNo'] > 0">-</span>
+                                            <span v-if="track['trackNo'] > 0">{{ track['trackNo'] }}</span>
+                                            <span v-if="track['diskNo'] > 0 || track['trackNo'] > 0">.</span>
+                                        </div>
+                                        <div>
+                                            <div>
+                                                {{ track['title'] }}
+                                            </div>
+                                            <div class="artist-information-holder">
+                                                <artist-map-to-linked-text :artists="track['artist']"></artist-map-to-linked-text>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <second-to-time-format :duration="track['duration']"></second-to-time-format>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -88,4 +112,18 @@ img {
 .content-info {
     margin-top: 40px;
 }
+
+.track-information-holder>div {
+    float: left;
+}
+
+.track-no-information-holder {
+    min-width: 38px;
+}
+
+.artist-information-holder {
+    font-size: 10pt;
+    color: darkgray;
+}
+
 </style>

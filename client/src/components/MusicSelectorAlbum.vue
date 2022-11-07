@@ -37,10 +37,10 @@ function selectInspectItem(item: any) {
     fetch('http://localhost:8080/' + 'library/1/album/' + item['mbid'], {
         credentials: 'include'
     })
-        .then(response => response.json)
+        .then(response => response.json())
         .then(r => {
-            item['track'] = r;
-            inspectingAlbum.value = item;
+            console.log(r);
+            inspectingAlbum.value = r;
         })
         .finally(() => { 
             loading.value = false;
