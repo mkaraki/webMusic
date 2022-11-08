@@ -38,8 +38,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track', function ($request, $resp
             tM.diskNo AS diskNo,
             tM.trackNo AS trackNo,
             tM.releaseMbid AS releaseMbid,
-            rM.title AS albumName,
-            rM.artworkPath AS artworkUrl
+            rM.title AS albumName
             FROM
                 track track,
                 trackMetadata tM,
@@ -62,6 +61,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track', function ($request, $resp
                 ORDER BY mapNo',
             $res[$i]['mbid']
         );
+        $res[$i]['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/album/' . $res[$i]['mbid'] . '/artwork';
     }
 
     $ret = [
@@ -92,7 +92,6 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:trackId]', function ($re
             tM.trackNo AS trackNo,
             tM.releaseMbid AS releaseMbid,
             rM.title AS albumName,
-            rM.artworkPath AS artworkUrl,
             rM.artworkColor AS artworkColor
             FROM
                 track track,
@@ -113,6 +112,8 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:trackId]', function ($re
         return;
     }
 
+    $res['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/track/' . $res['id'] . '/artwork';
+
     $res['artist'] = DB::query(
         'SELECT mapNo AS sequence, artistMbid, dispName, joinPhrase
                 FROM artistMap
@@ -123,71 +124,6 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:trackId]', function ($re
 
     setCors($request, $response);
     $response->json($res);
-});
-
-$klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/file', function ($request, $response) {
-    $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
-    if ($loggedUser === null) return;
-    if (!checkUserHavePermissionToExecuteLibrary($loggedUser, $request->libraryId)) {
-        $response->code(403);
-        return null;
-    }
-
-    $res = DB::queryFirstRow('SELECT path FROM track WHERE id=%i', $request->fileId);
-
-    if ($res === null || !is_file($res['path'])) {
-        $response->code(404);
-        return;
-    }
-
-    $fp = $res['path'];
-    $fmime = mime_content_type($fp);
-    $fsize = filesize($fp);
-    $fptr = fopen($fp, 'rb');
-
-    $response->header("Content-type", $fmime);
-    setCors($request, $response);
-
-    if (isset($request->headers()['Range'])) {
-        $range = explode('=', $request->headers()['Range']);
-        if ($range[0] !== 'bytes' || count($range) !== 2) {
-            $response->code(416);
-            $response->header('Content-Range', "bytes */$fsize");
-            return;
-        }
-
-        $rangebytes = explode(',', $range[1]);
-        $rangebyte = explode('-', $rangebytes[0]);
-        if (count($rangebytes) !== 1 || count($rangebyte) !== 2 || (!is_numeric($rangebyte[0]) && $rangebyte[0] !== '') | (!is_numeric($rangebyte[1]) && $rangebyte[1] !== '')) {
-            $response->code(416);
-            $response->header('Content-Range', "bytes */$fsize");
-            return;
-        }
-
-        $p_s = intval($rangebyte[0]);
-        $p_e = min($p_s + 1048576, $fsize - 1);
-        if (is_numeric($rangebyte[1]))
-            $p_e = intval($rangebyte[1]);
-
-        if ($p_s < 0 || $p_e >= $fsize) {
-            $response->code(416);
-            $response->header('Content-Range', "bytes */$fsize");
-            return;
-        }
-
-        $r_l = $p_e - $p_s + 1;
-        fseek($fptr, $p_s);
-
-        $response->header('Content-Range', "bytes $p_s-$p_e/$fsize");
-        $response->header("Content-Length", $r_l);
-
-        $response->code(206);
-        $response->body(fread($fptr, $r_l));
-    } else {
-        $response->header("Accept-Ranges", "bytes");
-        $response->header("Content-Length", $fsize);
-        $response->file($fp);
-    }
 });
 
 $klein->respond('GET', '/library/[i:libraryId]/album/[:mbid]', function ($request, $response) {
@@ -202,7 +138,6 @@ $klein->respond('GET', '/library/[i:libraryId]/album/[:mbid]', function ($reques
         'SELECT
             tM.releaseMbid AS mbid,
             rM.title AS albumName,
-            rM.artworkPath AS artworkUrl,
             rM.artworkColor AS artworkColor
             FROM
                 track track,
@@ -223,6 +158,8 @@ $klein->respond('GET', '/library/[i:libraryId]/album/[:mbid]', function ($reques
         $response->code(404);
         return;
     }
+
+    $res['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/album/' . $res['mbid'] . '/artwork';
 
     $res['artist'] = DB::query(
         'SELECT mapNo AS sequence, artistMbid, dispName, joinPhrase
@@ -281,8 +218,7 @@ $klein->respond('GET', '/library/[i:libraryId]/album', function ($request, $resp
     $res = DB::query(
         'SELECT
             tM.releaseMbid AS mbid,
-            rM.title AS albumName,
-            rM.artworkPath AS artworkUrl
+            rM.title AS albumName
             FROM
                 track track,
                 trackMetadata tM,
@@ -306,6 +242,8 @@ $klein->respond('GET', '/library/[i:libraryId]/album', function ($request, $resp
                 ORDER BY mapNo',
             $res[$i]['mbid']
         );
+
+        $res[$i]['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/album/' . $res[$i]['mbid'] . '/artwork';
     }
 
     $ret = [
@@ -316,3 +254,5 @@ $klein->respond('GET', '/library/[i:libraryId]/album', function ($request, $resp
     setCors($request, $response);
     $response->json($ret);
 });
+
+require_once(__DIR__ . '/library_file_bridge.php');

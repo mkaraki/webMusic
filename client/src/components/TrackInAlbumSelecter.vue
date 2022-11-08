@@ -126,4 +126,7 @@ img {
     color: darkgray;
 }
 
+.list-group-item {
+    color: white;
+}
 </style>
