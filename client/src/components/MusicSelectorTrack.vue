@@ -6,7 +6,8 @@ import SelectorMenu from './SelectorMenu.vue';
 
 let items = ref([]);
 
-const baseurl = inject('baseurl')();
+const baseurlGetter: any = inject('baseurl');
+const baseurl = baseurlGetter();
 
 function addItemsRecursive(url: string) {
     fetch(baseurl + url, {

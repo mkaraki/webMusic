@@ -5,7 +5,8 @@ import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 
 const emit = defineEmits(['togglePlaybackQueue']);
 
-const baseurl = inject('baseurl')();
+const baseurlGetter: any = inject('baseurl');
+const baseurl = baseurlGetter();
 
 const pos = ref(0.0);
 
