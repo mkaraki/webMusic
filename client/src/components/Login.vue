@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, Ref, ref } from "vue";
 
 const emit = defineEmits(['loginSucceed']);
 
-const serverSelected = ref(false);
+const serverSelected = ref(true);
 const loading = ref(false);
 
 const baseUrl = ref('');
 
-const formServerUrl = ref(null);
-const formLogin = ref(null);
+const formServerUrl: Ref<any> = ref(null);
+const formLogin: Ref<any> = ref(null);
 
 function tryLoginWithServer(e: any) {
     loading.value = true;
@@ -67,7 +67,7 @@ function loginToServer() {
 }
 
 onMounted(() => {
-    baseUrl.value = localStorage.getItem('lastConnectedServer') ?? '';
+    baseUrl.value = localStorage.getItem('lastConnectedServer') ?? (window.location.origin + '/');
     tryLoginWithServerAddress(baseUrl.value);
 });
 

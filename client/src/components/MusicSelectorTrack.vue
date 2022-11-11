@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref, provide } from 'vue'
-import axios from 'axios';
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 import { emitter } from '../emitter';
 

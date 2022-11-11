@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref, provide } from 'vue'
-import axios from 'axios';
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 import TrackInAlbumSelecter from './TrackInAlbumSelecter.vue';
 import Loading from './Loading.vue'
@@ -94,17 +93,4 @@ function selectInspectItem(item: any) {
     width: 210px;
 }
 
-.cut-overflow {
-    overflow-y: hidden;
-    display: block;
-}
-
-.card-artist {
-    display: block;
-    height: 25px;
-}
-
-.card-album {
-    height: 22px;
-}
 </style>

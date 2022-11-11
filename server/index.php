@@ -86,6 +86,51 @@ $klein->respond('GET', '/track/[:mbid]', function ($request, $response) {
     $response->json($res);
 });
 
+
+$klein->respond('/app/', function ($request, $response) {
+    $path = __DIR__ . '/public/index.html';
+    if (!is_file($path)) {
+        $response->code(404);
+        return;
+    }
+
+    $content = file_get_contents($path);
+    $response->body($content);
+});
+
+$klein->respond('/app/[**:path]', function ($request, $response) {
+    $basepath = realpath(__DIR__ . '/public');
+    $path = $basepath . '/' . $request->path;
+    if (!str_starts_with(realpath($path), $basepath)) {
+        $response->code(403);
+        return;
+    }
+    if (!is_file($path)) {
+        $response->code(404);
+        return;
+    }
+
+    $content = file_get_contents($path);
+    switch (end(explode('.', $path))) {
+        case "js":
+            $response->header('Content-Type', 'application/javascript');
+            break;
+
+        case "css":
+            $response->header('Content-Type', 'text/css');
+            break;
+
+        default:
+            $response->header('Content-Type', mime_content_type($path));
+            break;
+    }
+    $response->body($content);
+});
+
+$klein->respond('/[|app:entry]', function ($request, $response) {
+    $response->redirect('/app/');
+});
+
 require_once(__DIR__ . '/api/library.php');
 
 $klein->dispatch();
