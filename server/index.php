@@ -131,8 +131,21 @@ $klein->respond('/app/[**:path]', function ($request, $response) {
 });
 
 $klein->respond('/[|app:entry]', function ($request, $response) {
+    try {
+        $testUser = DB::queryFirstRow('SELECT id FROM user LIMIT 1');
+        if ($testUser === null) {
+            $response->redirect('/setup/createuser', 302);
+            return;
+        }
+    } catch (\Throwable $ex) {
+        $response->redirect('/setup/createtable', 302);
+        return;
+    }
+
     $response->redirect('/app/');
 });
+
+require_once(__DIR__ . '/ui/router.php');
 
 require_once(__DIR__ . '/api/library.php');
 

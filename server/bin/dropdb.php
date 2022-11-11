@@ -18,7 +18,7 @@ foreach (array_reverse($target_tables) as $table) {
     print(' => ' . $sql . "\n");
     try {
         DB::query($sql);
-    } catch (Exception $e) {
+    } catch (\Throwable $e) {
         print(' <= ERROR: ' . $e->getMessage() . "\n");
     }
 }

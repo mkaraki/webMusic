@@ -1,3 +1,4 @@
 /vendor
 /_debugtmp
 /public
+/.env

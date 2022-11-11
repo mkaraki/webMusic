@@ -18,7 +18,8 @@ if (count($q) > 0) {
 
 DB::insert('user', [
     'username' => $username,
-    'passhash' => $pwdhash
+    'passhash' => $pwdhash,
+    'permission' => 0 # Permission 0: Administrator
 ]);
 
 print('User generated with password: ' . $randpwd . "\n");

@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  webmusic:
+    build: .
+    environment:
+      - DB_HOST=db
+      - DB_USER=webmusic
+      - DB_NAME=webmusic
+      - DB_PASS=secret_password
+    ports:
+      - 7070:80
+
+  db:
+    image: mariadb
+    environment:
+      - MARIADB_RANDOM_ROOT_PASSWORD=yes
+      - MARIADB_DATABASE=webmusic
+      - MARIADB_USER=webmusic
+      - MARIADB_PASSWORD=secret_password

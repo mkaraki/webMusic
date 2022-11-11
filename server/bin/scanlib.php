@@ -291,7 +291,7 @@ foreach ($libs as $libinfo) {
             DB::commit();
 
             print("! $fp added.\n");
-        } catch (Exception $ex) {
+        } catch (\Throwable $ex) {
             DB::rollback();
             //throw $ex;
             print("@ Failed to add $fp: " . $ex->getMessage() . "\n");

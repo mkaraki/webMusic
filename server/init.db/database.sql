@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS user(
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(256) NOT NULL UNIQUE,
-    passhash TEXT NOT NULL
+    passhash TEXT NOT NULL,
+    permission INT NOT NULL DEFAULT(1)
 );
 CREATE TABLE IF NOT EXISTS sessionToken(
     token CHAR(64) PRIMARY KEY,

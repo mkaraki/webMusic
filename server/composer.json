@@ -4,6 +4,8 @@
         "klein/klein": "^2.1",
         "sergeytsalkov/meekrodb": "^2.4",
         "aminyazdanpanah/php-ffmpeg-video-streaming": "^1.2",
-        "james-heinrich/getid3": "^1.9"
+        "james-heinrich/getid3": "^1.9",
+        "twbs/bootstrap": "5.0.2",
+        "vlucas/phpdotenv": "^5.5"
     }
 }
