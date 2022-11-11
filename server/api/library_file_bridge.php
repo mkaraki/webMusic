@@ -78,12 +78,10 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/artwork', functi
             rM.artworkPath AS fallback
             FROM
                 track t,
-                trackMetadata tM,
                 releaseMetadata rM
             WHERE
                 t.id = %i AND
-                tM.releaseMbid = rm.mbid AND
-                t.trackMbid=tM.trackMbid',
+                t.releaseId = rM.id',
         $request->fileId
     );
 
@@ -123,7 +121,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/artwork', functi
     $response->redirect($res['fallback'], 302);
 });
 
-$klein->respond('GET', '/library/[i:libraryId]/album/[:mbid]/artwork', function ($request, $response) {
+$klein->respond('GET', '/library/[i:libraryId]/album/[i:id]/artwork', function ($request, $response) {
     $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
     if ($loggedUser === null) return;
     if (!checkUserHavePermissionToExecuteLibrary($loggedUser, $request->libraryId)) {
@@ -137,13 +135,11 @@ $klein->respond('GET', '/library/[i:libraryId]/album/[:mbid]/artwork', function 
             rM.artworkPath AS fallback
             FROM
                 track t,
-                trackMetadata tM,
                 releaseMetadata rM
             WHERE
-                tM.releaseMbid = %s AND
-                tM.releaseMbid = rm.mbid AND
-                t.trackMbid=tM.trackMbid',
-        $request->mbid
+                t.releaseId = %i AND
+                t.releaseId = rM.id',
+        $request->id
     );
 
     if ($res === null) {

@@ -31,20 +31,23 @@ CREATE TABLE IF NOT EXISTS artistMetadata(
     imagePath TEXT,
     disambiguation LONGTEXT
 );
-CREATE TABLE IF NOT EXISTS release(
+CREATE TABLE IF NOT EXISTS releaseMetadata(
     id INT PRIMARY KEY AUTO_INCREMENT,
+    libraryId INT NOT NULL,
     releaseMbid CHAR(36),
     title TEXT,
     titlePhonic TEXT,
     artworkPath TEXT,
     artworkColor VARCHAR(6) DEFAULT(NULL),
     releaseDate DATE,
-    disambiguation LONGTEXT
+    disambiguation LONGTEXT,
+    FOREIGN KEY(libraryId) REFERENCES library(id)
 );
 CREATE TABLE IF NOT EXISTS track(
     id INT PRIMARY KEY AUTO_INCREMENT,
     libraryId INT NOT NULL,
     recordingMbid CHAR(36),
+    trackMbid CHAR(36),
     releaseId INT,
     title TEXT,
     duration INT,
@@ -52,18 +55,18 @@ CREATE TABLE IF NOT EXISTS track(
     trackNo INT NOT NULL DEFAULT(0),
     path TEXT NOT NULL,
     FOREIGN KEY(libraryId) REFERENCES library(id),
-    FOREIGN KEY (releaseId) REFERENCES release(id),
+    FOREIGN KEY (releaseId) REFERENCES releaseMetadata(id)
 );
 CREATE TABLE IF NOT EXISTS artistMap(
     id INT PRIMARY KEY AUTO_INCREMENT,
-    type INT NOT NULL DEFAULT(1),
+    type INT NOT NULL,
     artistId INT NOT NULL,
     mapNo INT DEFAULT(0),
-    dispName TEXT DEFAULT(NULL),
-    joinPhrase TEXT DEFAULT(NULL),
-    releaseMbid CHAR(36) DEFAULT(NULL),
-    trackMbid CHAR(36) DEFAULT(NULL),
+    dispName TEXT NOT NULL,
+    joinPhrase TEXT DEFAULT(''),
+    releaseId INT DEFAULT(NULL),
+    trackId INT DEFAULT(NULL),
     FOREIGN KEY(artistId) REFERENCES artistMetadata(id),
-    FOREIGN KEY(releaseMbid) REFERENCES releaseMetadata(mbid),
-    FOREIGN KEY(trackMbid) REFERENCES trackMetadata(trackMbid)
+    FOREIGN KEY(releaseId) REFERENCES releaseMetadata(id),
+    FOREIGN KEY(trackId) REFERENCES track(id)
 );

@@ -21,4 +21,4 @@ $istres = DB::insert('library', [
     'basepath' => $dir,
 ]);
 
-print('Library added. Id: ' . $istres[0]['id'] . "\n");
+print('Library added. Id: ' . DB::insertId() . "\n");

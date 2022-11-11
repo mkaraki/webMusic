@@ -27,7 +27,7 @@ function tryLoginWithServerAddress(baseurl: string){
         credentials: 'include'
     })
         .then(response => {
-            if (response.status === 204) {
+            if (response.status === 200) {
                 localStorage.setItem('lastConnectedServer', baseurl);
                 emit('loginSucceed');
             }

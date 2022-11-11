@@ -34,7 +34,7 @@ const inspectingAlbum = ref(null);
 
 function selectInspectItem(item: any) { 
     loading.value = true;
-    fetch('http://localhost:8080/' + 'library/1/album/' + item['mbid'], {
+    fetch('http://localhost:8080/' + 'library/1/album/' + item['id'], {
         credentials: 'include'
     })
         .then(response => response.json())
@@ -53,7 +53,7 @@ function selectInspectItem(item: any) {
     <loading v-if="loading"></loading>
     <div class="container-fluid" v-else-if="inspectingAlbum === null">
         <div class="row g-4">
-            <div class="col" v-for="item in items" :key="item['mbid']">
+            <div class="col" v-for="item in items" :key="item['id']">
                 <div class="card h-100">
                     <a v-on:click="selectInspectItem(item)">
                         <img :src="item['artworkUrl']" class="card-img-top" :alt="item['albumName']">

@@ -31,22 +31,19 @@ $klein->respond('GET', '/library/[i:libraryId]/track', function ($request, $resp
     $page = $request->paramsGet()['page'] ?? 1;
     $res = DB::query(
         'SELECT
-            track.id AS id,
-            tM.trackMbid AS mbid,
-            tM.title AS title,
-            tM.duration AS duration,
-            tM.diskNo AS diskNo,
-            tM.trackNo AS trackNo,
-            tM.releaseMbid AS releaseMbid,
+            t.id AS id,
+            t.trackMbid AS mbid,
+            t.title AS title,
+            t.duration AS duration,
+            t.diskNo AS diskNo,
+            t.trackNo AS trackNo,
             rM.title AS albumName
             FROM
-                track track,
-                trackMetadata tM,
+                track t,
                 releaseMetadata rM
             WHERE
-                track.libraryId = %i AND
-                track.trackMbid = tM.trackMbid AND
-                tM.releaseMbid = rM.mbid
+                t.libraryId = %i AND
+                t.releaseId = rM.id
             ORDER BY albumName, diskNo, trackNo
             LIMIT %i, 51',
         $request->libraryId,
@@ -55,11 +52,11 @@ $klein->respond('GET', '/library/[i:libraryId]/track', function ($request, $resp
 
     for ($i = 0; $i < count($res); $i++) {
         $res[$i]['artist'] = DB::query(
-            'SELECT mapNo AS sequence, artistMbid, dispName, joinPhrase
+            'SELECT mapNo AS sequence, artistId, dispName, joinPhrase
                 FROM artistMap
-                WHERE trackMbid = %s
+                WHERE trackId = %i
                 ORDER BY mapNo',
-            $res[$i]['mbid']
+            $res[$i]['id']
         );
         $res[$i]['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/album/' . $res[$i]['mbid'] . '/artwork';
     }
@@ -84,24 +81,21 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:trackId]', function ($re
     $page = $request->paramsGet()['page'] ?? 1;
     $res = DB::queryFirstRow(
         'SELECT
-            track.id AS id,
-            tM.trackMbid AS mbid,
-            tM.title AS title,
-            tM.duration AS duration,
-            tM.diskNo AS diskNo,
-            tM.trackNo AS trackNo,
-            tM.releaseMbid AS releaseMbid,
+            t.id AS id,
+            t.trackMbid AS mbid,
+            t.title AS title,
+            t.duration AS duration,
+            t.diskNo AS diskNo,
+            t.trackNo AS trackNo,
             rM.title AS albumName,
             rM.artworkColor AS artworkColor
             FROM
-                track track,
-                trackMetadata tM,
+                track t,
                 releaseMetadata rM
             WHERE
-                track.libraryId = %i AND
-                track.trackMbid = tM.trackMbid AND
-                tM.releaseMbid = rM.mbid AND
-                track.id = %i
+                t.libraryId = %i AND
+                t.releaseId = rM.id AND
+                t.id = %i
             LIMIT 1',
         $request->libraryId,
         $request->trackId
@@ -115,18 +109,18 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:trackId]', function ($re
     $res['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/track/' . $res['id'] . '/artwork';
 
     $res['artist'] = DB::query(
-        'SELECT mapNo AS sequence, artistMbid, dispName, joinPhrase
+        'SELECT mapNo AS sequence, artistId, dispName, joinPhrase
                 FROM artistMap
-                WHERE trackMbid = %s
+                WHERE trackId = %i
                 ORDER BY mapNo',
-        $res['mbid']
+        $res['id']
     );
 
     setCors($request, $response);
     $response->json($res);
 });
 
-$klein->respond('GET', '/library/[i:libraryId]/album/[:mbid]', function ($request, $response) {
+$klein->respond('GET', '/library/[i:libraryId]/album/[i:id]', function ($request, $response) {
     $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
     if ($loggedUser === null) return;
     if (!checkUserHavePermissionToReadLibrary($loggedUser, $request->libraryId)) {
@@ -136,22 +130,20 @@ $klein->respond('GET', '/library/[i:libraryId]/album/[:mbid]', function ($reques
 
     $res = DB::queryFirstRow(
         'SELECT
-            tM.releaseMbid AS mbid,
+            t.releaseId AS id,
             rM.title AS albumName,
             rM.artworkColor AS artworkColor
             FROM
-                track track,
-                trackMetadata tM,
+                track t,
                 releaseMetadata rM
             WHERE
-                track.libraryId = %i AND
-                track.trackMbid = tM.trackMbid AND
-                tM.releaseMbid = rM.mbid AND
-                tM.releaseMbid = %s
-            GROUP BY rM.mbid
-            ORDER BY tM.releaseMbid',
+                t.libraryId = %i AND
+                t.releaseId = rM.id AND
+                t.releaseId = %i
+            GROUP BY rM.id
+            ORDER BY rM.id',
         $request->libraryId,
-        $request->mbid
+        $request->id
     );
 
     if ($res == null) {
@@ -159,43 +151,41 @@ $klein->respond('GET', '/library/[i:libraryId]/album/[:mbid]', function ($reques
         return;
     }
 
-    $res['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/album/' . $res['mbid'] . '/artwork';
+    $res['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/album/' . $res['id'] . '/artwork';
 
     $res['artist'] = DB::query(
-        'SELECT mapNo AS sequence, artistMbid, dispName, joinPhrase
+        'SELECT mapNo AS sequence, artistId, dispName, joinPhrase
                 FROM artistMap
-                WHERE releaseMbid = %s
+                WHERE releaseId = %i
                 ORDER BY mapNo',
-        $res['mbid']
+        $res['id']
     );
 
     $tracks = DB::query(
         'SELECT
-            track.id AS id,
-            tM.trackMbid AS mbid,
-            tM.title AS title,
-            tM.duration AS duration,
-            tM.diskNo AS diskNo,
-            tM.trackNo AS trackNo
+            t.id AS id,
+            t.trackMbid AS mbid,
+            t.title AS title,
+            t.duration AS duration,
+            t.diskNo AS diskNo,
+            t.trackNo AS trackNo
             FROM
-                track track,
-                trackMetadata tM
+                track t
             WHERE
-                track.libraryId = %i AND
-                track.trackMbid = tM.trackMbid AND
-                tM.releaseMbid = %s
+                t.libraryId = %i AND
+                t.releaseId = %s
             ORDER BY diskNo, trackNo',
         $request->libraryId,
-        $request->mbid
+        $request->id
     );
 
     for ($i = 0; $i < count($tracks); $i++) {
         $tracks[$i]['artist'] = DB::query(
-            'SELECT mapNo AS sequence, artistMbid, dispName, joinPhrase
+            'SELECT mapNo AS sequence, artistId, dispName, joinPhrase
                 FROM artistMap
-                WHERE trackMbid = %s
+                WHERE trackId = %i
                 ORDER BY mapNo',
-            $tracks[$i]['mbid']
+            $tracks[$i]['id']
         );
     }
 
@@ -217,18 +207,16 @@ $klein->respond('GET', '/library/[i:libraryId]/album', function ($request, $resp
     $page = $request->paramsGet()['page'] ?? 1;
     $res = DB::query(
         'SELECT
-            tM.releaseMbid AS mbid,
+            t.releaseId AS id,
             rM.title AS albumName
             FROM
-                track track,
-                trackMetadata tM,
+                track t,
                 releaseMetadata rM
             WHERE
-                track.libraryId = %i AND
-                track.trackMbid = tM.trackMbid AND
-                tM.releaseMbid = rM.mbid
-            GROUP BY rM.mbid
-            ORDER BY tM.releaseMbid
+                t.libraryId = %i AND
+                t.releaseId = rM.id
+            GROUP BY t.releaseId
+            ORDER BY t.releaseId
             LIMIT %i, 51',
         $request->libraryId,
         ($page - 1) * 50
@@ -236,14 +224,14 @@ $klein->respond('GET', '/library/[i:libraryId]/album', function ($request, $resp
 
     for ($i = 0; $i < count($res); $i++) {
         $res[$i]['artist'] = DB::query(
-            'SELECT mapNo AS sequence, artistMbid, dispName, joinPhrase
+            'SELECT mapNo AS sequence, artistId, dispName, joinPhrase
                 FROM artistMap
-                WHERE releaseMbid = %s
+                WHERE releaseId = %i
                 ORDER BY mapNo',
-            $res[$i]['mbid']
+            $res[$i]['id']
         );
 
-        $res[$i]['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/album/' . $res[$i]['mbid'] . '/artwork';
+        $res[$i]['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/album/' . $res[$i]['id'] . '/artwork';
     }
 
     $ret = [

@@ -5,8 +5,7 @@ function loginAndExtendTokenExpire(string $token): null|int
     $tokenSession = DB::queryFirstRow('SELECT userid, expire FROM sessionToken WHERE token=%s AND expire>CURRENT_TIMESTAMP', $token);
 
     if ($tokenSession === null)
-        return false;
-
+        return null;
 
     $tokenSession['expire'] = intval((new DateTime($tokenSession['expire']))->format('U'));
 
@@ -75,6 +74,8 @@ $klein->respond('POST', '/login', function ($request, $response) {
 
 $klein->respond('GET', '/login/check', function ($request, $response) {
     setCors($request, $response);
+    $user = loginAndExtendTokenExpireWithKlein($request, $response);
 
-    $response->code(loginAndExtendTokenExpireWithKlein($request, $response) !== null ? 204 : 401);
+    if ($user !== null)
+        $response->json(['loggedUser' => $user]);
 });

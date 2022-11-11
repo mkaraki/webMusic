@@ -9,7 +9,6 @@ $target_tables = [
     'accessList',
     'artistMetadata',
     'releaseMetadata',
-    'trackMetadata',
     'track',
     'artistMap'
 ];
