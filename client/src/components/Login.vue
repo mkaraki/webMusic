@@ -16,20 +16,25 @@ function tryLoginWithServer(e: any) {
     if (formServerUrl.value === null)
         return false;
     let baseurl: string = (formServerUrl.value.value ?? '');
-    if (!baseurl.endsWith('/'))
-        baseurl += '/';
+    if (baseurl.endsWith('/'))
+        baseurl = baseurl.slice(0, -1)
 
     tryLoginWithServerAddress(baseurl);
 }
 
 function tryLoginWithServerAddress(baseurl: string){
-    fetch(baseurl + 'login/check', {
+    fetch(baseurl + '/login/check', {
         credentials: 'include'
     })
         .then(response => {
+
             if (response.status === 200) {
-                localStorage.setItem('lastConnectedServer', baseurl);
-                emit('loginSucceed');
+                response.json().then(json => { 
+                    if (json['loggedUser'] !== undefined) {
+                        localStorage.setItem('lastConnectedServer', baseurl);
+                        emit('loginSucceed', baseurl);
+                    }
+                });
             }
             else if (response.status === 401) {
                 serverSelected.value = true;
@@ -37,6 +42,9 @@ function tryLoginWithServerAddress(baseurl: string){
             else { 
                 serverSelected.value = false;
             }
+        })
+        .catch(error => { 
+            serverSelected.value = false;
         })
         .finally(() => {
             baseUrl.value = baseurl;
@@ -47,7 +55,7 @@ function tryLoginWithServerAddress(baseurl: string){
 function loginToServer() { 
     loading.value = true;
 
-    fetch(baseUrl.value + 'login', {
+    fetch(baseUrl.value + '/login', {
         method: 'POST',
         body: new FormData(formLogin.value),
         credentials: 'include'
@@ -58,6 +66,9 @@ function loginToServer() {
                 localStorage.setItem('lastConnectedServer', baseUrl.value);
                 emit('loginSucceed');
             }
+        })
+        .catch (error => { 
+            serverSelected.value = false;
         })
         .finally(() => { 
             loading.value = false;
@@ -82,6 +93,9 @@ onMounted(() => {
         </div>
         <div v-else-if="serverSelected" class="login-dialog">
             <form v-on:submit="loginToServer" ref="formLogin">
+                <div class="mb-3">
+                    <a href="#" v-on:click="serverSelected = false"><i class="bi bi-arrow-left"></i></a>
+                </div>
                 <div class="mb-3">
                     <label for="login-username" class="form-label">Username</label>
                     <input type="text" class="form-control" id="login-username" name="username">

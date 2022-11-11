@@ -8,7 +8,10 @@ require_once(__DIR__ . '/api/login.php');
 
 function setCors($request, $response, bool $auth = true)
 {
-    $response->header('Access-Control-Allow-Origin', 'http://127.0.0.1:5173');
+    global $cors_origin;
+
+    if (isset($cors_origin))
+        $response->header('Access-Control-Allow-Origin', $cors_origin);
     if ($auth)
         $response->header('Access-Control-Allow-Credentials', 'true');
 }

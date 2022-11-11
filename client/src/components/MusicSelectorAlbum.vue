@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, provide } from 'vue'
+import { onMounted, ref, provide, inject } from 'vue'
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 import TrackInAlbumSelecter from './TrackInAlbumSelecter.vue';
 import Loading from './Loading.vue'
@@ -8,20 +8,22 @@ import SelectorMenu from './SelectorMenu.vue';
 
 let items = ref([]);
 
-function addItemsRecursive(baseurl: string, url: string) {
+const baseurl = inject('baseurl')();
+
+function addItemsRecursive(url: string) {
     fetch(baseurl + url, {
         credentials: 'include'
     })
-        .then(response => response.json())
-        .then(res => {
-            items.value = items.value.concat(res['result'])
-            if (res['next'] !== null)
-                addItemsRecursive(baseurl, res['next']);
-        });
+    .then(response => response.json())
+    .then(res => {
+        items.value = items.value.concat(res['result'])
+        if (res['next'] !== null)
+        addItemsRecursive(res['next']);
+    });
 }
 
 onMounted(() => {
-    addItemsRecursive('http://localhost:8080', '/library/1/album');
+    addItemsRecursive('/library/1/album');
 });
 
 function sendSelectedTrackInfo(trackId: number) {
@@ -34,7 +36,7 @@ const inspectingAlbum = ref(null);
 
 function selectInspectItem(item: any) { 
     loading.value = true;
-    fetch('http://localhost:8080/' + 'library/1/album/' + item['id'], {
+    fetch(baseurl + '/library/1/album/' + item['id'], {
         credentials: 'include'
     })
         .then(response => response.json())
@@ -60,12 +62,12 @@ function selectInspectItem(item: any) {
         <div class="row g-4">
             <div class="col" v-for="item in items" :key="item['id']">
                 <div class="card h-100">
-                    <a v-on:click="selectInspectItem(item)">
-                        <img :src="item['artworkUrl']" class="card-img-top" :alt="item['albumName']">
+                    <a v-on:click="selectInspectItem(item)" href="#">
+                        <img :src="baseurl + item['artworkUrl']" class="card-img-top" :alt="item['albumName']">
                     </a>
                     <div class="card-body">
                         <h5 class="card-title cut-overflow card-album">
-                            <a v-on:click="selectInspectItem(item)">
+                            <a v-on:click="selectInspectItem(item)" href="#" class="list-group-item-action">
                                 {{ item['albumName'] }}
                             </a>
                         </h5>

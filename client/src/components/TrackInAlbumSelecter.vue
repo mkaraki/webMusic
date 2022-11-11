@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
-import { defineEmits } from 'vue'
+import { defineEmits, inject } from 'vue'
 import SecondToTimeFormat from './SecondToTimeFormat.vue';
 import SelectorMenu from './SelectorMenu.vue';
 
 import { emitter } from '../emitter';
 
 const emit = defineEmits(['back']);
+
+const baseurl = inject('baseurl')();
 
 defineProps<{
     album: any,
@@ -19,7 +21,7 @@ function sendSelectedTrackInfo(trackId: number) {
 </script>
 
 <template>
-    <div class="holder" :style="{ '--bgImage': 'url(' + album['artworkUrl'] + ')' }">
+    <div class="holder" :style="{ '--bgImage': 'url(' + baseurl + album['artworkUrl'] + ')' }">
         <div class="container-fluid">
             <div class="row">
                 <div class="col p-0">
@@ -28,7 +30,7 @@ function sendSelectedTrackInfo(trackId: number) {
             </div>
             <div class="row coverart-bg">
                 <div class="col-12 col-md-4 text-center">
-                    <img :src="album['artworkUrl']" alt="Artwork" class="img-fluid w-100">
+                    <img :src="baseurl + album['artworkUrl']" alt="Artwork" class="img-fluid w-100">
                 </div>
                 <div class="col-12 col-md-8 content-info">
                     <h2>{{ album['albumName'] }}</h2>

@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 import { emitter } from '../emitter';
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 
 const emit = defineEmits(['togglePlaybackQueue']);
+
+const baseurl = inject('baseurl')();
 
 const pos = ref(0.0);
 
@@ -20,8 +22,8 @@ player.ontimeupdate = function () {
 }
 
 emitter.on('newTrackSelected', (t) => {
-    const baseurl = 'http://localhost:8080/library/1/track/' + t;
-    fetch(baseurl, {
+    const url = baseurl + '/library/1/track/' + t;
+    fetch(url, {
         credentials: 'include'
     })
         .then(response => response.json())
@@ -30,8 +32,8 @@ emitter.on('newTrackSelected', (t) => {
             albumName.value = res['albumName'];
             albumMbid.value = res['releaseMbid'];
             artistMap.value = res['artist'];
-            player.src = baseurl + '/file';
-            coverurl.value = res['artworkUrl'];
+            player.src = url + '/file';
+            coverurl.value = baseurl + res['artworkUrl'];
             covercolor.value = '#' + (res['artworkColor'] ?? '999');
             pos.value = 0;
             player.play();
@@ -76,7 +78,7 @@ function saveVolume(event: any) {
         <div class="d-flex justify-content-between">
             <div class="controller-playback-mediainfo-holder">
                 <div class="controller-playback-mediainfo-image-holder">
-                    <img :src=coverurl alt="Coverart" class="img-fluid">
+                    <img :src="coverurl" alt="Coverart" class="img-fluid">
                 </div>
                 <div class="controller-playback-mediainfo-text-holder">
                     <p class="controller-playback-mediainfo-title">{{ title }}</p>

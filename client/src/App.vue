@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import { Ref, ref, provide } from 'vue';
+import { ref, provide } from 'vue';
 import PlaybackController from './components/PlaybackController.vue'
 import PlayingQueueController from './components/PlayingQueueController.vue';
 import MusicSelectorTrack from './components/MusicSelectorTrack.vue';
@@ -16,7 +16,7 @@ const coverUrl = ref('');
 const selectorView = ref('album');
 
 emitter.on('gotPlayingInformation', (i: any) => {
-  coverUrl.value = i['artworkUrl'];
+  coverUrl.value = srvbaseurl.value + i['artworkUrl'];
 });
 
 emitter.on('changeView', (i: any) => {
@@ -24,6 +24,17 @@ emitter.on('changeView', (i: any) => {
 });
 
 const loggedIn = ref(false);
+
+const srvbaseurl = ref('');
+
+provide('baseurl', function () {
+  return srvbaseurl.value;
+});
+
+function hdlLoggedIn(baseurl: string) { 
+  loggedIn.value = true;
+  srvbaseurl.value = baseurl;
+};
 
 </script>
 
@@ -45,7 +56,7 @@ const loggedIn = ref(false);
         ></playback-controller>
     </div>
   </div>
-  <login v-else v-on:login-succeed="loggedIn = true"></login>
+  <login v-else v-on:login-succeed="hdlLoggedIn"></login>
 
 
 </template>

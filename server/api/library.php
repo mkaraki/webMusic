@@ -58,7 +58,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track', function ($request, $resp
                 ORDER BY mapNo',
             $res[$i]['id']
         );
-        $res[$i]['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/album/' . $res[$i]['mbid'] . '/artwork';
+        $res[$i]['artworkUrl'] = '/library/' . $request->libraryId . '/album/' . $res[$i]['mbid'] . '/artwork';
     }
 
     $ret = [
@@ -106,7 +106,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:trackId]', function ($re
         return;
     }
 
-    $res['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/track/' . $res['id'] . '/artwork';
+    $res['artworkUrl'] = '/library/' . $request->libraryId . '/track/' . $res['id'] . '/artwork';
 
     $res['artist'] = DB::query(
         'SELECT mapNo AS sequence, artistId, dispName, joinPhrase
@@ -151,7 +151,7 @@ $klein->respond('GET', '/library/[i:libraryId]/album/[i:id]', function ($request
         return;
     }
 
-    $res['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/album/' . $res['id'] . '/artwork';
+    $res['artworkUrl'] = '/library/' . $request->libraryId . '/album/' . $res['id'] . '/artwork';
 
     $res['artist'] = DB::query(
         'SELECT mapNo AS sequence, artistId, dispName, joinPhrase
@@ -231,7 +231,7 @@ $klein->respond('GET', '/library/[i:libraryId]/album', function ($request, $resp
             $res[$i]['id']
         );
 
-        $res[$i]['artworkUrl'] = 'http://localhost:8080/library/' . $request->libraryId . '/album/' . $res[$i]['id'] . '/artwork';
+        $res[$i]['artworkUrl'] = '/library/' . $request->libraryId . '/album/' . $res[$i]['id'] . '/artwork';
     }
 
     $ret = [
