@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
-import { onMounted, Ref, ref } from 'vue'
+import { defineEmits } from 'vue'
 import SecondToTimeFormat from './SecondToTimeFormat.vue';
+import SelectorMenu from './SelectorMenu.vue';
 
 import { emitter } from '../emitter';
+
+const emit = defineEmits(['back']);
 
 defineProps<{
     album: any,
@@ -18,8 +21,13 @@ function sendSelectedTrackInfo(trackId: number) {
 <template>
     <div class="holder" :style="{ '--bgImage': 'url(' + album['artworkUrl'] + ')' }">
         <div class="container-fluid">
+            <div class="row">
+                <div class="col p-0">
+                    <selector-menu v-on:back="emit('back')" current-view="album"></selector-menu>
+                </div>
+            </div>
             <div class="row coverart-bg">
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-md-4 text-center">
                     <img :src="album['artworkUrl']" alt="Artwork" class="img-fluid w-100">
                 </div>
                 <div class="col-12 col-md-8 content-info">

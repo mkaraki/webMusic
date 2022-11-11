@@ -4,6 +4,7 @@ import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 import TrackInAlbumSelecter from './TrackInAlbumSelecter.vue';
 import Loading from './Loading.vue'
 import { emitter } from '../emitter';
+import SelectorMenu from './SelectorMenu.vue';
 
 let items = ref([]);
 
@@ -51,6 +52,11 @@ function selectInspectItem(item: any) {
 <template>
     <loading v-if="loading"></loading>
     <div class="container-fluid" v-else-if="inspectingAlbum === null">
+        <div class="row">
+            <div class="col p-0">
+                <selector-menu current-view="album" :back-disabled="true"></selector-menu>
+            </div>
+        </div>
         <div class="row g-4">
             <div class="col" v-for="item in items" :key="item['id']">
                 <div class="card h-100">
@@ -73,7 +79,7 @@ function selectInspectItem(item: any) {
         </div>
     </div>
     <div v-else class="album-info">
-        <track-in-album-selecter :album="inspectingAlbum" class="album-info"></track-in-album-selecter>
+        <track-in-album-selecter :album="inspectingAlbum" class="album-info" v-on:back="inspectingAlbum = null"></track-in-album-selecter>
     </div>
 </template>
 

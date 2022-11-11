@@ -2,6 +2,7 @@
 import { onMounted, ref, provide } from 'vue'
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 import { emitter } from '../emitter';
+import SelectorMenu from './SelectorMenu.vue';
 
 let items = ref([]);
 
@@ -28,7 +29,9 @@ function sendSelectedTrackInfo(trackId: number) {
 </script>
 
 <template>
+    <selector-menu current-view="track" :back-disabled="true"></selector-menu>
     <ol class="list-group" ref="itemList">
+
         <li class="list-group-item d-flex justify-content-between align-items-start" v-for="item in items" :key="item['id']">
             <div class="ms-2 me-auto">
                 <div class="fw-bold"><a v-on:click="sendSelectedTrackInfo(item['id'])">{{item['title']}}</a></div>

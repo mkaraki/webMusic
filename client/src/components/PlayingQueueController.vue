@@ -22,20 +22,22 @@ function changeFullCover() {
 <template>
     <div class="container-fluid">
         <div class="row">
-            <div :class="playingControlToggle ? 'col-12 col-lg-6' : 'col-12'" :style="{ '--bgImage': 'url(' + coverUrl + ')' }">
+            <div :class="playingControlToggle ? 'col-12 col-lg-6' : 'col-12'" :style="{ '--bgImage': 'url(' + coverUrl + ')' }"
+                id="art">
                 <div class="playing-coverart d-flex justify-content-center align-items-center">
                     <img :src="coverUrl" alt="Coverart" class="img-fluid">
                 </div>
 
                 <div class="playing-control-container-toggler">
-                    <button class="btn btn-light"
-                        v-on:click="changeFullCover">
+                    <a class="btn btn-light"
+                        v-on:click="changeFullCover"
+                        :href="playingControlToggle ? '#queue' : '#art'">
                         <i class="bi bi-list"></i>
-                    </button>
+                    </a>
                 </div>
             </div>
 
-            <div class="col-12 col-lg-6 playlist-control-container" v-if="playingControlToggle">
+            <div class="col-12 col-lg-6 playlist-control-container" v-if="playingControlToggle" id="queue">
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="#">Playlist</a>
@@ -93,7 +95,7 @@ div:has(.playing-control-container-toggler) {
     position: relative;
 }
 
-.playing-control-container-toggler button {
+.playing-control-container-toggler a {
     position: absolute;
     bottom: 15px;
     right: 15px;

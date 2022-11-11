@@ -13,8 +13,14 @@ const displayPlaybackQueue = ref(false);
 
 const coverUrl = ref('');
 
+const selectorView = ref('album');
+
 emitter.on('gotPlayingInformation', (i: any) => {
-    coverUrl.value = i['artworkUrl'];
+  coverUrl.value = i['artworkUrl'];
+});
+
+emitter.on('changeView', (i: any) => {
+  selectorView.value = i;
 });
 
 const loggedIn = ref(false);
@@ -25,11 +31,11 @@ const loggedIn = ref(false);
 
   <div v-if="loggedIn">
     <div class="queue-controller">
-      <playing-queue-controller v-if="displayPlaybackQueue"
+      <playing-queue-controller :class="(displayPlaybackQueue ? '' : 'hide')"
         :coverUrl="coverUrl"></playing-queue-controller>
-      <div v-else>
-        <music-selector-album />
-        <music-selector-track />
+      <div :class="(displayPlaybackQueue ? 'hide' : '')">
+        <music-selector-track v-if="selectorView === 'track'" />
+        <music-selector-album v-else />
       </div>
     </div>
   
@@ -45,6 +51,10 @@ const loggedIn = ref(false);
 </template>
 
 <style scoped>
+.hide {
+  display: none;
+}
+
 .queue-controller,
 .queue-controller div {
   height: calc(100vh - 100px);
