@@ -9,6 +9,9 @@ let items = ref([]);
 const baseurlGetter: any = inject('baseurl');
 const baseurl = baseurlGetter();
 
+const libraryIdGetter: any = inject('libraryId');
+const libraryId = libraryIdGetter();
+
 function addItemsRecursive(url: string) {
     fetch(baseurl + url, {
         credentials: 'include'
@@ -22,7 +25,7 @@ function addItemsRecursive(url: string) {
 }
 
 onMounted(() => {
-    addItemsRecursive('/library/1/track');
+    addItemsRecursive(`/library/${libraryId}/track`);
 });
 
 function sendSelectedTrackInfo(trackId: number) { 

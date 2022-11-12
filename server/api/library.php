@@ -4,9 +4,13 @@ function checkUserHavePermissionToAccessLibrary(int $userId, int $libraryId): in
 {
     $acl = DB::queryFirstRow('SELECT permission FROM accessList WHERE userid=%i AND libraryId = %i', $userId, $libraryId);
 
-    if ($acl === null)
-        return 0;
-    else
+    if ($acl === null) {
+        $guestAcl = DB::queryFirstRow('SELECT permission FROM accessList WHERE userid IS NULL AND libraryId = %i', $libraryId);
+        if ($guestAcl === null)
+            return 0;
+        else
+            return $guestAcl['permission'];
+    } else
         return $acl['permission'];
 }
 
@@ -19,6 +23,58 @@ function checkUserHavePermissionToExecuteLibrary(int $userId, int $libraryId): b
 {
     return (checkUserHavePermissionToAccessLibrary($userId, $libraryId) & 0b001) > 0;
 }
+
+$klein->respond('GET', '/library', function ($request, $response) {
+    $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
+    if ($loggedUser === null) return;
+
+    $availLibraries = DB::query(
+        'SELECT
+            l.id,
+            l.name
+        FROM
+            library l,
+            accessList a
+        WHERE
+            l.id = a.libraryId AND
+            a.userid = %i AND
+            a.permission > 0',
+        $loggedUser
+    );
+
+    $guestAvailLibraries = DB::query(
+        'SELECT
+            l.id,
+            l.name
+        FROM
+            library l,
+            accessList a
+        WHERE
+            l.id = a.libraryId AND
+            a.userid IS NULL AND
+            a.permission > 0'
+    );
+
+    $ret = array_merge($availLibraries, $guestAvailLibraries);
+
+    setCors($request, $response);
+    $response->json($ret);
+});
+
+$klein->respond('GET', '/library/[i:libraryId]/check', function ($request, $response) {
+    $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
+    if ($loggedUser === null) return;
+    $permission = checkUserHavePermissionToAccessLibrary($loggedUser, $request->libraryId);
+
+    setCors($request, $response);
+    if ($permission > 0) {
+        $response->code(204);
+        return;
+    } else {
+        $response->code(403);
+        return;
+    }
+});
 
 $klein->respond('GET', '/library/[i:libraryId]/track', function ($request, $response) {
     $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);

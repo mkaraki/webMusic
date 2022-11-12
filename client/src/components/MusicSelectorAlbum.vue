@@ -11,6 +11,10 @@ let items = ref([]);
 const baseurlGetter: any = inject('baseurl');
 const baseurl = baseurlGetter();
 
+const libraryIdGetter: any = inject('libraryId');
+const libraryId = libraryIdGetter();
+
+
 function addItemsRecursive(url: string) {
     fetch(baseurl + url, {
         credentials: 'include'
@@ -24,7 +28,7 @@ function addItemsRecursive(url: string) {
 }
 
 onMounted(() => {
-    addItemsRecursive('/library/1/album');
+    addItemsRecursive(`/library/${libraryId}/album`);
 });
 
 function sendSelectedTrackInfo(trackId: number) {
@@ -37,7 +41,7 @@ const inspectingAlbum = ref(null);
 
 function selectInspectItem(item: any) { 
     loading.value = true;
-    fetch(baseurl + '/library/1/album/' + item['id'], {
+    fetch(baseurl + `/library/${libraryId}/album/` + item['id'], {
         credentials: 'include'
     })
         .then(response => response.json())

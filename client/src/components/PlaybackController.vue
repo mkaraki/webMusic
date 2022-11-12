@@ -8,6 +8,9 @@ const emit = defineEmits(['togglePlaybackQueue']);
 const baseurlGetter: any = inject('baseurl');
 const baseurl = baseurlGetter();
 
+const libraryIdGetter: any = inject('libraryId');
+const libraryId = libraryIdGetter();
+
 const pos = ref(0.0);
 
 const title = ref('');
@@ -23,7 +26,7 @@ player.ontimeupdate = function () {
 }
 
 emitter.on('newTrackSelected', (t) => {
-    const url = baseurl + '/library/1/track/' + t;
+    const url = baseurl + `/library/${libraryId}/track/` + t;
     fetch(url, {
         credentials: 'include'
     })

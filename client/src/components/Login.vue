@@ -3,7 +3,7 @@ import { onMounted, Ref, ref } from "vue";
 
 const emit = defineEmits(['loginSucceed']);
 
-const serverSelected = ref(true);
+const serverSelected = ref(false);
 const loading = ref(false);
 
 const baseUrl = ref('');
@@ -22,60 +22,76 @@ function tryLoginWithServer(e: any) {
     tryLoginWithServerAddress(baseurl);
 }
 
-function tryLoginWithServerAddress(baseurl: string){
+function tryLoginWithServerAddress(baseurl: string) {
     fetch(baseurl + '/login/check', {
         credentials: 'include'
     })
         .then(response => {
-
             if (response.status === 200) {
-                response.json().then(json => { 
+                response.text().then(rawjson => {
+                    const json = JSON.parse(rawjson);
+                    console.log(json);
                     if (json['loggedUser'] !== undefined) {
+                        baseUrl.value = baseurl;
                         localStorage.setItem('lastConnectedServer', baseurl);
                         emit('loginSucceed', baseurl);
+                    }
+                    else {
+                        serverSelected.value = false;
                     }
                 });
             }
             else if (response.status === 401) {
                 serverSelected.value = true;
             }
-            else { 
+            else {
                 serverSelected.value = false;
             }
         })
-        .catch(error => { 
+        .catch(error => {
             serverSelected.value = false;
         })
         .finally(() => {
-            baseUrl.value = baseurl;
             loading.value = false;
         });
 }
 
-function loginToServer() { 
+function loginToServer() {
     loading.value = true;
 
-    fetch(baseUrl.value + '/login', {
+    let baseurl: string = (formServerUrl.value.value ?? '');
+    if (baseurl.endsWith('/'))
+        baseurl = baseurl.slice(0, -1)
+
+    fetch(baseurl + '/login', {
         method: 'POST',
-        body: new FormData(formLogin.value),
-        credentials: 'include'
+        body: new FormData(formLogin.value)
     })
         .then(response => {
-            if (response.status === 200)
-            {
-                localStorage.setItem('lastConnectedServer', baseUrl.value);
-                emit('loginSucceed');
+            if (response.status === 200) {
+                response.text().then(rawjson => {
+                    const json = JSON.parse(rawjson);
+                    console.log(json);
+                    if (json['token'] !== undefined) {
+                        localStorage.setItem('lastConnectedServer', baseurl);
+                        emit('loginSucceed', baseurl);
+                    }
+                    else {
+                        serverSelected.value = false;
+                    }
+                });
             }
         })
-        .catch (error => { 
+        .catch(error => {
             serverSelected.value = false;
         })
-        .finally(() => { 
+        .finally(() => {
             loading.value = false;
         });
 
     return false;
 }
+
 
 onMounted(() => {
     baseUrl.value = localStorage.getItem('lastConnectedServer') ?? (window.location.origin + '/');
