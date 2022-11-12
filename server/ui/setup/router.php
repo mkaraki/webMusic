@@ -36,6 +36,11 @@ $klein->respond('POST', '/setup/createuser', function ($request, $response, $ser
         return;
     }
 
+    if (!preg_match('/^([a-zA-Z0-9]|\-|\.|_)+$/', $_POST['username'])) {
+        $response->code('400');
+        return 'Username must be made by alphabet, number, `-`, `.`, and `_`.';
+    }
+
     $result = DB::insert('user', [
         'username' => $_POST['username'],
         'passhash' => password_hash($_POST['password'], PASSWORD_DEFAULT),
