@@ -70,7 +70,7 @@ const tabMode = ref('playlist');
                             </li>
                         </ul>
                     </div>
-                    <div>
+                    <div class="inner-information-container">
                         <div v-if="tabMode === 'lyric'"></div>
                         <div v-else>
                             <div class="list-group">
@@ -143,6 +143,7 @@ const tabMode = ref('playlist');
 
 .playlist-control-container {
     padding: 50px;
+    height: 100%;
 }
 
 div:has(.playing-control-container-toggler) {
@@ -184,10 +185,12 @@ div:has(.playing-control-container-toggler) {
     border: white 1px solid;
     border-top: none;
     border-radius: 0px;
+    z-index: 0;
 }
 
 .list-group-item.active {
     background-color: rgba(47, 47, 118, 0.5);
     border: lightskyblue 1px solid;
+    z-index: 1;
 }
 </style>
