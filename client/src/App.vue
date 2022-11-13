@@ -36,6 +36,14 @@ emitter.on('changeView', (i: any) => {
   selectorView.value = i;
 });
 
+emitter.on('setPlaylist', (i: any) => {
+  playlist.value = i['list'];
+  playingNo.value = i['playing'];
+});
+
+const playlist = ref([]);
+const playingNo = ref(0);
+
 const srvbaseurl = ref('');
 
 const libraryId: Ref<null|number> = ref(null);
@@ -48,6 +56,19 @@ provide('libraryId', function () {
   return libraryId.value;
 });
 
+function playbackEnded(isLoop: boolean = false) { 
+  playingNo.value++;
+
+  if (playingNo.value < playlist.value.length) {
+    emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
+  }
+  else { 
+    playingNo.value = 0;
+    if (isLoop)
+      emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
+  }
+}
+
 </script>
 
 <template>
@@ -57,7 +78,9 @@ provide('libraryId', function () {
   <div v-else>
     <div class="queue-controller">
       <playing-queue-controller :class="(displayPlaybackQueue ? '' : 'hide')"
-        :coverUrl="coverUrl"></playing-queue-controller>
+        :coverUrl="coverUrl"
+        :playingNo="playingNo"
+        :playlist="playlist"></playing-queue-controller>
       <div :class="(displayPlaybackQueue ? 'hide' : '')">
         <music-selector-track v-if="selectorView === 'track'" />
         <music-selector-album v-else />
@@ -67,6 +90,7 @@ provide('libraryId', function () {
     <div class="controller">
       <playback-controller 
         v-on:toggle-playback-queue="displayPlaybackQueue = !displayPlaybackQueue"
+        v-on:playback-ended="playbackEnded"
         ></playback-controller>
     </div>
   </div>

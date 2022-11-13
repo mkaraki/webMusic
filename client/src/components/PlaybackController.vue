@@ -3,7 +3,7 @@ import { inject, onMounted, ref } from 'vue'
 import { emitter } from '../emitter';
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 
-const emit = defineEmits(['togglePlaybackQueue']);
+const emit = defineEmits(['togglePlaybackQueue', 'playbackEnded']);
 
 const baseurlGetter: any = inject('baseurl');
 const baseurl = baseurlGetter();
@@ -23,6 +23,9 @@ const covercolor = ref('#999');
 const player = new Audio();
 player.ontimeupdate = function () { 
     pos.value = player.currentTime / player.duration;
+}
+player.onended = function () { 
+    emit('playbackEnded', false);
 }
 
 emitter.on('newTrackSelected', (t) => {

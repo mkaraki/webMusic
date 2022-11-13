@@ -19,6 +19,17 @@ function sendSelectedTrackInfo(trackId: number) {
     emitter.emit<any>('newTrackSelected', trackId)
 }
 
+function playQueue(trackList: Array<any>, track: any) {
+    const playingNo = trackList.findIndex(v => v['id'] === track['id']);
+
+    emitter.emit('setPlaylist', {
+        'list': trackList,
+        'playing': playingNo,
+    });
+
+    sendSelectedTrackInfo(track['id']);
+}
+
 </script>
 
 <template>
@@ -41,8 +52,8 @@ function sendSelectedTrackInfo(trackId: number) {
                     <div>
                         <div class="list-group">
                             <a href="#" class="list-group-item list-group-item-action"
-                                v-for="track in album['track']" :key="track['mbid']"
-                                v-on:click="sendSelectedTrackInfo(track['id']);">
+                                v-for="track in album['track']" :key="track['id']"
+                                v-on:click="playQueue(album['track'], track)">
                                 <div class="d-flex justify-content-between align-items-start w-100">
                                     <div class="me-auto track-information-holder">
                                         <div class="track-no-information-holder">
