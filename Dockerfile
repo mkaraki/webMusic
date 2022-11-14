@@ -49,3 +49,4 @@ EOF
 
 COPY --from=require-server /app /var/www/html
 COPY --from=build-webapp /app/dist /var/www/html/public
+COPY server/bin/*.php /bin/
