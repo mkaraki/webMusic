@@ -20,12 +20,14 @@ const artistMap = ref([]);
 const coverurl = ref('');
 const covercolor = ref('#999');
 
+const loopMode = ref(0);
+
 const player = new Audio();
 player.ontimeupdate = function () { 
     pos.value = player.currentTime / player.duration;
 }
 player.onended = function () { 
-    emit('playbackEnded', false);
+    emit('playbackEnded', loopMode.value == 2);
 }
 
 emitter.on('newTrackSelected', (t) => {
@@ -56,6 +58,14 @@ function togglePlaybackStete() {
     player.pause();
 }
 
+function toggleLoopState() { 
+    loopMode.value++;
+    if (loopMode.value > 2)
+        loopMode.value = 0;
+        
+    player.loop = (loopMode.value == 1);
+}
+
 function controller_playback_position_click(event: any) {
     const newPos = event.clientX * 1.0 / window.innerWidth;
     player.currentTime = player.duration * newPos;
@@ -64,6 +74,9 @@ function controller_playback_position_click(event: any) {
 onMounted(() => {
     const savedValue = localStorage.getItem('playerVolume') ?? '1';
     player.volume = parseFloat(savedValue);
+
+    loopMode.value = parseInt(localStorage.getItem('playerLoop') ?? '0');
+    player.loop = (loopMode.value == 1);
 });
 
 
@@ -115,6 +128,12 @@ function saveVolume(event: any) {
                         v-on:click="togglePlaybackStete">
                         <i v-if="!(player.paused || player.ended)" class="bi bi-pause"></i>
                         <i v-else class="bi bi-play-fill"></i>
+                    </button>
+                    <button class="controller-playback-control-button"
+                        v-on:click="toggleLoopState">
+                        <i v-if="loopMode === 1" class="bi bi-repeat-1"></i>
+                        <i v-else-if="loopMode === 2" class="bi bi-repeat"></i>
+                        <i v-else class="bi bi-repeat grayout"></i>
                     </button>
                     <button class="controller-playback-control-button"
                         v-on:click="emit('togglePlaybackQueue')">
@@ -213,4 +232,7 @@ function saveVolume(event: any) {
     display: block;
 }
 
+.grayout {
+    color: gray;
+}
 </style>
