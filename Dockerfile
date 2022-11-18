@@ -26,6 +26,7 @@ COPY server/init.db/database.sql /app/init.db/
 COPY server/composer.* /app/
 COPY server/api /app/api
 COPY server/ui /app/ui
+COPY server/bin/*.php /app/bin/
 
 RUN composer install --no-dev
 
@@ -49,4 +50,3 @@ EOF
 
 COPY --from=require-server /app /var/www/html
 COPY --from=build-webapp /app/dist /var/www/html/public
-COPY server/bin/*.php /bin/
