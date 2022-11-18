@@ -8,14 +8,14 @@ const loading = ref(false);
 
 const baseUrl = ref('');
 
-const formServerUrl: Ref<any> = ref(null);
+const formServerUrl: Ref<string | null> = ref(null);
 const formLogin: Ref<any> = ref(null);
 
 function tryLoginWithServer(e: any) {
     loading.value = true;
     if (formServerUrl.value === null)
         return false;
-    let baseurl: string = (formServerUrl.value.value ?? '');
+    let baseurl: string = (formServerUrl.value ?? '');
     if (baseurl.endsWith('/'))
         baseurl = baseurl.slice(0, -1)
 
@@ -59,7 +59,7 @@ function tryLoginWithServerAddress(baseurl: string) {
 function loginToServer() {
     loading.value = true;
 
-    let baseurl: string = (formServerUrl.value.value ?? '');
+    let baseurl: string = (formServerUrl.value ?? '');
     if (baseurl.endsWith('/'))
         baseurl = baseurl.slice(0, -1)
 
@@ -127,7 +127,7 @@ onMounted(() => {
             <form v-on:submit="tryLoginWithServer" ref="server">
                 <div class="mb-3">
                     <label for="login-serveraddr" class="form-label">Server Address</label>
-                    <input type="url" class="form-control" id="login-serveraddr" ref="formServerUrl">
+                    <input type="url" class="form-control" id="login-serveraddr" v-model="formServerUrl">
                 </div>
                 <button type="submit" class="btn btn-primary">Connect</button>
             </form>
