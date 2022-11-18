@@ -71,7 +71,6 @@ function loginToServer() {
             if (response.status === 200) {
                 response.text().then(rawjson => {
                     const json = JSON.parse(rawjson);
-                    console.log(json);
                     if (json['token'] !== undefined) {
                         localStorage.setItem('lastConnectedServer', baseurl);
                         emit('loginSucceed', baseurl);
