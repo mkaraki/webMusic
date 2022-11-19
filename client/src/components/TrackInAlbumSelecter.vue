@@ -104,6 +104,7 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center center;
+    background-attachment: fixed;
     position: absolute;
     top: 0;
     bottom: 0;
