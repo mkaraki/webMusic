@@ -54,7 +54,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/file', function 
 
         $response->header('Content-Range', "bytes $p_s-$p_e/$fsize");
         $response->header("Content-Length", $r_l);
-        $response->header("Cache-Control: max-age=604600, private, immutable");
+        $response->header("Cache-Control", "max-age=604600, private, immutable");
 
         $response->code(206);
         $response->body(fread($fptr, $r_l));
