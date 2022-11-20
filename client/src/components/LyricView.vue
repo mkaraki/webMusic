@@ -74,6 +74,10 @@ onMounted(() => {
 </template>
 
 <style>
+span {
+    font-size: large;
+}
+
 span:empty:before {
     content: "\200b";
 }
