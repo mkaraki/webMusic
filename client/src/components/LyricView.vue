@@ -73,7 +73,7 @@ onMounted(() => {
     </div>
 </template>
 
-<style>
+<style scoped>
 span {
     font-size: large;
 }
