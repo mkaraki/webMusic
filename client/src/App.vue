@@ -41,6 +41,8 @@ emitter.on('setPlaylist', (i: any) => {
   playingNo.value = i['playing'];
 });
 
+const playingTime = ref(0.0);
+
 const playlist = ref([]);
 const playingNo = ref(0);
 
@@ -69,6 +71,10 @@ function playbackEnded(isLoop: boolean = false) {
   }
 }
 
+function onTimeUpdate(time: number) {
+  playingTime.value = time;
+}
+
 </script>
 
 <template>
@@ -80,7 +86,8 @@ function playbackEnded(isLoop: boolean = false) {
       <playing-queue-controller :class="(displayPlaybackQueue ? '' : 'hide')"
         :coverUrl="coverUrl"
         :playingNo="playingNo"
-        :playlist="playlist"></playing-queue-controller>
+        :playlist="playlist"
+        :current-time="playingTime"></playing-queue-controller>
       <div :class="(displayPlaybackQueue ? 'hide' : '')">
         <music-selector-track v-if="selectorView === 'track'" />
         <music-selector-album v-else />
@@ -91,6 +98,7 @@ function playbackEnded(isLoop: boolean = false) {
       <playback-controller 
         v-on:toggle-playback-queue="displayPlaybackQueue = !displayPlaybackQueue"
         v-on:playback-ended="playbackEnded"
+        v-on:on-time-update="onTimeUpdate"
         ></playback-controller>
     </div>
   </div>

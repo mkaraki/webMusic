@@ -3,11 +3,13 @@ import { onMounted, ref } from "vue";
 import { emitter } from "../emitter";
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 import SecondToTimeFormat from './SecondToTimeFormat.vue';
+import LyricView from './LyricView.vue';
 
 defineProps<{
     coverUrl: string,
     playlist: Array<any>,
     playingNo: number,
+    currentTime: number,
 }>()
 
 const playingControlToggle = ref(true);
@@ -66,12 +68,14 @@ const tabMode = ref('playlist');
                                     v-on:click="tabMode = 'playlist'">Playlist</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Lyric</a>
+                                <a :class="'nav-link ' + (tabMode === 'lyric' ? 'active' : '')" href="#" v-on:click="tabMode = 'lyric'">Lyric</a>
                             </li>
                         </ul>
                     </div>
                     <div class="inner-information-container">
-                        <div v-if="tabMode === 'lyric'"></div>
+                        <div v-if="tabMode === 'lyric'">
+                            <lyric-view :track-id="playlist[playingNo]['id']" :key="playlist[playingNo]['id']" :current-time="currentTime"></lyric-view>
+                        </div>
                         <div v-else>
                             <div class="list-group">
                                 <a href="#"

@@ -8,9 +8,6 @@ import { emitter } from '../emitter';
 
 const emit = defineEmits(['back']);
 
-const baseurlGetter: any = inject('baseurl');
-const baseurl = baseurlGetter();
-
 defineProps<{
     album: any,
 }>()

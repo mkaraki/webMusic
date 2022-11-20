@@ -3,7 +3,7 @@ import { inject, onMounted, ref } from 'vue'
 import { emitter } from '../emitter';
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 
-const emit = defineEmits(['togglePlaybackQueue', 'playbackEnded']);
+const emit = defineEmits(['togglePlaybackQueue', 'playbackEnded', 'onTimeUpdate']);
 
 const baseurlGetter: any = inject('baseurl');
 const baseurl = baseurlGetter();
@@ -25,6 +25,7 @@ const loopMode = ref(0);
 const player = new Audio();
 player.ontimeupdate = function () { 
     pos.value = player.currentTime / player.duration;
+    emit('onTimeUpdate', player.currentTime);
 }
 player.onended = function () { 
     emit('playbackEnded', loopMode.value == 2);
