@@ -163,6 +163,12 @@ div:has(.playing-control-container-toggler) {
 .information-container {
     padding-left: 50px;
     padding-right: 50px;
+    height: 100%;
+}
+
+.inner-information-container {
+    height: calc(100% - 42px);
+    overflow: auto;
 }
 
 .nav-link.active {
