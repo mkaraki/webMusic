@@ -54,12 +54,14 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/file', function 
 
         $response->header('Content-Range', "bytes $p_s-$p_e/$fsize");
         $response->header("Content-Length", $r_l);
+        $response->header("Cache-Control: max-age=604600, private, immutable");
 
         $response->code(206);
         $response->body(fread($fptr, $r_l));
     } else {
         $response->header("Accept-Ranges", "bytes");
         $response->header("Content-Length", $fsize);
+        $response->header("Cache-Control", "max-age=604600, private, immutable");
         $response->file($fp);
     }
 });
@@ -126,6 +128,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/lyric', function
     }
 
     setCors($request, $response);
+    $response->header("Cache-Control", "max-age=604600, private");
     $response->json($retjson);
 });
 
@@ -169,6 +172,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/artwork', functi
     }
 
     if ($artworkPath !== null) {
+        $response->header("Cache-Control", "max-age=604600, private");
         $response->file($artworkPath);
         return;
     }
@@ -179,6 +183,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/artwork', functi
     if (!empty($metadata['comments']['picture'])) {
         $firstPic = array_values($metadata['comments']['picture'])[0];
         $response->header('Content-Type', $firstPic['image_mime']);
+        $response->header("Cache-Control", "max-age=604600, private");
         $response->body($firstPic['data']);
         return;
     }
@@ -225,6 +230,7 @@ $klein->respond('GET', '/library/[i:libraryId]/album/[i:id]/artwork', function (
     }
 
     if ($artworkPath !== null) {
+        $response->header("Cache-Control", "max-age=604600, private");
         $response->file($artworkPath);
         return;
     }
@@ -235,6 +241,7 @@ $klein->respond('GET', '/library/[i:libraryId]/album/[i:id]/artwork', function (
     if (!empty($metadata['comments']['picture'])) {
         $firstPic = array_values($metadata['comments']['picture'])[0];
         $response->header('Content-Type', $firstPic['image_mime']);
+        $response->header("Cache-Control", "max-age=604600, private");
         $response->body($firstPic['data']);
         return;
     }
