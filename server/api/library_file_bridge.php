@@ -89,7 +89,15 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/lyric', function
     );
 
     if (is_file($lrcbasepath . 'lrc')) {
-        $file = str_replace(array("\r\n", "\r"), "\n", file_get_contents($lrcbasepath . 'lrc'));
+        $file = str_replace(
+            array("\r\n", "\r"),
+            "\n",
+            preg_replace(
+                "/^\xEF\xBB\xBF/",
+                '',
+                file_get_contents($lrcbasepath . 'lrc')
+            )
+        );
         foreach (explode("\n", $file) as $line) {
             $regex = '/^\[(\d{2}):(\d{2})\.(\d{2})\](.*)$/';
             if (preg_match($regex, $line)) {
