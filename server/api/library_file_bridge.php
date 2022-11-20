@@ -64,6 +64,54 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/file', function 
     }
 });
 
+$klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/lyric', function ($request, $response) {
+    $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
+    if ($loggedUser === null) return;
+    if (!checkUserHavePermissionToExecuteLibrary($loggedUser, $request->libraryId)) {
+        $response->code(403);
+        return null;
+    }
+
+    $res = DB::queryFirstRow('SELECT path FROM track WHERE id=%i', $request->fileId);
+
+    if ($res === null || !is_file($res['path'])) {
+        $response->code(404);
+        return;
+    }
+
+    $pinfo = pathinfo($res['path']);
+    $lrcbasepath = $pinfo['dirname'] . '/' . $pinfo['filename'] . '.';
+
+    $retjson = array(
+        "lines" => array()
+    );
+
+    if (is_file($lrcbasepath . 'lrc')) {
+        $file = str_replace(array("\r\n", "\r"), "\n", file_get_contents($lrcbasepath . 'lrc'));
+        foreach (explode("\n", $file) as $line) {
+            if (preg_match('/^\[(\d{2}):(\d{2})\.(\d{2})\](.+)$/', $line)) {
+                $data = preg_replace('/^\[(\d{2}):(\d{2})\.(\d{2})\](.+)$/', "$1\0$2\0$3\0$4", $line);
+                $binData = explode("\0", $data);
+                $time = ($binData[2] * 10) + ($binData[1] * 1000) + ($binData[0] * 60 * 1000);
+                $retjson['lines'][] = array(
+                    'time' => $time,
+                    'sections' => array(
+                        array(
+                            'time' => $time,
+                            'text' => $binData[3],
+                        )
+                    )
+                );
+            }
+        }
+    } else {
+        $response->code(404);
+        return;
+    }
+
+    $response->json($retjson);
+});
+
 $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/artwork', function ($request, $response) {
     $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
     if ($loggedUser === null) return;
