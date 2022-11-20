@@ -18,7 +18,7 @@ const gotLyric = ref('loading');
 
 const holder: Ref<any> = ref(null);
 
-let currentFocused = 0;
+let currentFocused = -1;
 
 onMounted(() => {
     fetch(baseurl + `/library/${libraryId}/track/` + props.trackId + '/lyric', {
