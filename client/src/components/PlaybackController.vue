@@ -18,7 +18,6 @@ const albumName = ref('');
 const albumMbid = ref('');
 const artistMap = ref([]);
 const coverurl = ref('');
-const covercolor = ref('#999');
 
 const loopMode = ref(0);
 
@@ -43,8 +42,7 @@ emitter.on('newTrackSelected', (t) => {
             albumMbid.value = res['releaseMbid'];
             artistMap.value = res['artist'];
             player.src = url + '/file';
-            coverurl.value = baseurl + res['artworkUrl'];
-            covercolor.value = '#' + (res['artworkColor'] ?? '999');
+            coverurl.value = baseurl + res['arddtworkUrl'];
             pos.value = 0;
             player.play();
 
@@ -92,7 +90,7 @@ function saveVolume(event: any) {
         <div class="controller-playback-position-holder" v-on:click="controller_playback_position_click">
             <div class="controller-playback-position-view">
                 <div class="controller-playback-position-indicator"
-                    v-bind:style="{ backgroundColor: covercolor, width: (pos * 100) + '%' }"></div>
+                    v-bind:style="{ width: (pos * 100) + '%' }"></div>
             </div>
         </div>
 
@@ -154,9 +152,10 @@ function saveVolume(event: any) {
 }
 
 .controller-playback-position-view {
+    position: relative;
     height: 100%;
     width: 100vw;
-    background-color: #333;
+    background-color: black;
 }
 
 .controller-playback-position-holder:hover {
@@ -164,9 +163,11 @@ function saveVolume(event: any) {
 }
 
 .controller-playback-position-indicator {
+    position: relative;
     height: 100%;
     width: 0%;
-    background-color: #E33;
+    background-color: #999;
+    overflow: hidden;
 }
 
 .controller-playback-mediainfo-holder {
