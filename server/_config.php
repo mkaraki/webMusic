@@ -20,4 +20,4 @@ DB::$encoding = 'utf8';
 
 $cors_origin = getEnvInfo('CORS_ORIGIN', null);
 
-$useapcu = apcu_enabled();
+$transformedFileDir = __DIR__ . '/cache';

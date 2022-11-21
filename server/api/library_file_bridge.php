@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/utils/image.php';
+
 $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/file', function ($request, $response) {
     $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
     if ($loggedUser === null) return;
@@ -67,8 +69,6 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/file', function 
 });
 
 $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/lyric', function ($request, $response) {
-    global $useapcu;
-
     $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
     if ($loggedUser === null) return;
     if (!checkUserHavePermissionToExecuteLibrary($loggedUser, $request->libraryId)) {
@@ -80,8 +80,8 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/lyric', function
         "lines" => array()
     );
 
-    if ($useapcu && apcu_exists('/lyric/' . $request->libraryId . '/' . $request->fileId)) {
-        $retjson = apcu_fetch('/lyric/' . $request->libraryId . '/' . $request->fileId);
+    if (isFileInTransformedStore('lyric.' . $request->fileId . '.json')) {
+        $retjson = json_decode(readFileInTransformedStore('lyric.' . $request->fileId . '.json'), true);
     } else {
         $res = DB::queryFirstRow('SELECT path FROM track WHERE id=%i', $request->fileId);
 
@@ -141,12 +141,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/lyric', function
             return;
         }
 
-        if ($useapcu)
-            apcu_store(
-                '/lyric/' . $request->libraryId . '/' . $request->fileId,
-                $retjson,
-                604600
-            );
+        writeFileToTransformedStore('lyric.' . $request->fileId . '.json', json_encode($retjson));
     }
 
     setCors($request, $response);
@@ -155,8 +150,6 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/lyric', function
 });
 
 $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/artwork', function ($request, $response) {
-    global $useapcu;
-
     $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
     if ($loggedUser === null) return;
     if (!checkUserHavePermissionToExecuteLibrary($loggedUser, $request->libraryId)) {
@@ -164,19 +157,13 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/artwork', functi
         return null;
     }
 
-    if ($useapcu && apcu_exists('/artwork/track:' . $request->fileId)) {
-        $artdata = apcu_fetch('/artwork/track:' . $request->fileId);
-        $response->header('Content-Type', $artdata['mime']);
+    if (isImageExistInTransformedStore('art.' . $request->fileId)) {
         $response->header("Cache-Control", "max-age=604600, private");
-        $response->body($artdata['data']);
+        writeImageInTransformedStoreToResponse('art.' . $request->fileId, $response);
         return;
     } else {
-        $res = null;
-        if ($useapcu && apcu_exists('/dbquery/track/' . $request->fileId . '?col=path,artworkPath'))
-            $res = apcu_fetch('/dbquery/track/' . $request->fileId . '?col=path,artworkPath');
-        else {
-            $res = DB::queryFirstRow(
-                'SELECT
+        $res = DB::queryFirstRow(
+            'SELECT
                 t.path AS path,
                 rM.artworkPath AS fallback
                 FROM
@@ -185,17 +172,17 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/artwork', functi
                 WHERE
                     t.id = %i AND
                     t.releaseId = rM.id',
-                $request->fileId
-            );
+            $request->fileId
+        );
 
-            apcu_store('/dbquery/track/' . $request->fileId . '?col=path,artworkPath', $res, 604600);
-        }
 
         if ($res === null) {
             $response->code(404);
             return;
         }
 
+
+        // Try to get image from contained directries image file
         $parent = dirname($res['path']);
         $possible_cover_filenames = [
             'cover.jpg', 'cover.jpeg', 'cover.png', 'cover.bmp', 'cover.gif', 'cover.webp'
@@ -209,39 +196,39 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/artwork', functi
         }
 
         if ($artworkPath !== null) {
-            $artObj = array(
-                'mime' => mime_content_type($artworkPath),
-                'data' => file_get_contents($artworkPath),
-            );
-            $response->header('Content-Type', $artObj['mime']);
             $response->header("Cache-Control", "max-age=604600, private");
-            $response->body($artObj['data']);
-            apcu_store('/artwork/track:' . $request->fileId, $artObj, 604600);
+            $artObj = loadImageObjectAndResizeWidthAndConvertToConfiguratedFormatImageObject(array(
+                'data' => file_get_contents($artworkPath)
+            ), 1000);
+            writeImageObjectToResponse($artObj, $response);
+            writeImageObjectToTransformedStore($artObj, 'art.' . $request->fileId);
             return;
         }
 
+        // Try to get image from id3
         $gid3 = new getID3;
         $metadata = $gid3->analyze($res['path']);
 
         if (!empty($metadata['comments']['picture'])) {
             $firstPic = array_values($metadata['comments']['picture'])[0];
-            $response->header('Content-Type', $firstPic['image_mime']);
             $response->header("Cache-Control", "max-age=604600, private");
-            $response->body($firstPic['data']);
-            apcu_store('/artwork/track:' . $request->fileId, array(
-                'mime' => $firstPic['image_mime'],
-                'data' => $firstPic['data']
-            ), 604600);
+            $artObj = loadImageObjectAndResizeWidthAndConvertToConfiguratedFormatImageObject(array(
+                'data' => $firstPic['data'],
+            ), 1000);
+            writeImageObjectToResponse($artObj, $response);
+            writeImageObjectToTransformedStore($artObj, 'art.' . $request->fileId);
             return;
         }
 
-        $response->redirect($res['fallback'], 302);
+        // Fallback
+        if ($res['fallback'] !== null)
+            $response->redirect($res['fallback'], 302);
+        else
+            $response->code(404);
     }
 });
 
 $klein->respond('GET', '/library/[i:libraryId]/album/[i:id]/artwork', function ($request, $response) {
-    global $useapcu;
-
     $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
     if ($loggedUser === null) return;
     if (!checkUserHavePermissionToExecuteLibrary($loggedUser, $request->libraryId)) {
@@ -251,7 +238,7 @@ $klein->respond('GET', '/library/[i:libraryId]/album/[i:id]/artwork', function (
 
     $res = null;
 
-    if ($useapcu && apcu_exists('/artwork/album:' . $request->id))
+    if (apcu_exists('/artwork/album:' . $request->id))
         $res = apcu_fetch('/artwork/album:' . $request->id);
     else {
         $res = DB::queryFirstRow(
@@ -273,8 +260,14 @@ $klein->respond('GET', '/library/[i:libraryId]/album/[i:id]/artwork', function (
         return;
     }
 
-    $response->redirect(
-        '/library/' . $request->libraryId . '/track/' . $res['id'] . '/artwork',
-        302
-    );
+    if (isImageExistInTransformedStore('art.' . $res['id'])) {
+        $response->header("Cache-Control", "max-age=604600, private");
+        writeImageInTransformedStoreToResponse('art.' . $res['id'], $response);
+        return;
+    } else {
+        $response->redirect(
+            '/library/' . $request->libraryId . '/track/' . $res['id'] . '/artwork',
+            302
+        );
+    }
 });

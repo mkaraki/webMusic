@@ -71,6 +71,13 @@ $klein->respond('/[|app:entry]', function ($request, $response) {
     $response->redirect('/app/');
 });
 
+$klein->respond('GET', '/version', function ($request, $response) {
+    $response->json(array(
+        'server' => '2022112200001:add-apcu-support',
+        'api' => '2022112200001'
+    ));
+});
+
 require_once(__DIR__ . '/ui/router.php');
 
 require_once(__DIR__ . '/api/library.php');
