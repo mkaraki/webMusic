@@ -2,16 +2,32 @@
 
 function loginAndExtendTokenExpire(string $token): null|int
 {
-    $tokenSession = DB::queryFirstRow('SELECT userid, expire FROM sessionToken WHERE token=%s AND expire>CURRENT_TIMESTAMP', $token);
+    $tokenSession = null;
+
+    global $useapcu;
+    if ($useapcu && apcu_exists('token/' . $token)) {
+        $tokenSession = apcu_fetch('token/' . $token);
+        if ($tokenSession === false)
+            return null;
+    } else {
+        $tokenSession = DB::queryFirstRow('SELECT userid, expire FROM sessionToken WHERE token=%s AND expire>CURRENT_TIMESTAMP', $token);
+
+        if ($tokenSession === null)
+            return null;
+
+        $tokenSession['expire'] = intval((new DateTime($tokenSession['expire']))->format('U'));
+        apcu_store('token/' . $token, $tokenSession, $tokenSession['expire'] - time());
+    }
 
     if ($tokenSession === null)
         return null;
 
-    $tokenSession['expire'] = intval((new DateTime($tokenSession['expire']))->format('U'));
-
     // if token expire is less than 3 days
-    if ($tokenSession['expire'] - 259200 < time())
+    if ($tokenSession['expire'] - 259200 < time()) {
         DB::update('sessionToken', ['expire' => new DateTime('+1 weeks')], 'token=%s', $token);
+        $tokenSession['expire'] = time() + 604800;
+        apcu_store('token/' . $token, $tokenSession, $tokenSession['expire'] - time());
+    }
 
     if (!is_numeric($tokenSession['userid']))
         return null;

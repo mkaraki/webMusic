@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  webmusic:
+    #build: .
+    image: webmusic:latest
+    environment:
+      - DB_HOST=db
+      - DB_USER=webmusic
+      - DB_NAME=webmusic
+      - DB_PASS=secret_password
+      - CORS_ORIGIN=http://localhost:5173
+    ports:
+      - 7070:80
+    volumes:
+      - ./client/dist:/var/www/html/public
+      - ./server:/var/www/html
+      - ./musics:/music:ro
+
+  db:
+    image: mariadb
+    environment:
+      - MARIADB_RANDOM_ROOT_PASSWORD=yes
+      - MARIADB_DATABASE=webmusic
+      - MARIADB_USER=webmusic
+      - MARIADB_PASSWORD=secret_password

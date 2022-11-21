@@ -2,10 +2,23 @@
 
 function checkUserHavePermissionToAccessLibrary(int $userId, int $libraryId): int
 {
-    $acl = DB::queryFirstRow('SELECT permission FROM accessList WHERE userid=%i AND libraryId = %i', $userId, $libraryId);
+    global $useapcu;
+    $acl = null;
+    if ($useapcu && apcu_exists('/acl?user=' . $userId . '?lib=' . $libraryId))
+        $acl = apcu_fetch('/acl?user=' . $userId . '?lib=' . $libraryId);
+    else {
+        $acl = DB::queryFirstRow('SELECT permission FROM accessList WHERE userid=%i AND libraryId = %i', $userId, $libraryId);
+        apcu_store('/acl?user=' . $userId . '?lib=' . $libraryId, $acl, 259200);
+    }
 
     if ($acl === null) {
-        $guestAcl = DB::queryFirstRow('SELECT permission FROM accessList WHERE userid IS NULL AND libraryId = %i', $libraryId);
+        $guestAcl = null;
+        if ($useapcu && apcu_exists('/acl?user=guest?lib=' . $libraryId))
+            $guestAcl = apcu_fetch('/acl?user=guest?lib=' . $libraryId);
+        else {
+            $guestAcl = DB::queryFirstRow('SELECT permission FROM accessList WHERE userid IS NULL AND libraryId = %i', $libraryId);
+            apcu_store('/acl?user=guest?lib=' . $libraryId, $guestAcl, 259200);
+        }
         if ($guestAcl === null)
             return 0;
         else
