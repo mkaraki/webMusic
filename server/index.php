@@ -73,7 +73,6 @@ $klein->respond('/[|app:entry]', function ($request, $response) {
 
 $klein->respond('GET', '/version', function ($request, $response) {
     $response->json(array(
-        'server' => '2022112200001:add-apcu-support',
         'api' => '2022112200001'
     ));
 });
