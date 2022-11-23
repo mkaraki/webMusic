@@ -181,43 +181,45 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:fileId]/artwork', functi
             return;
         }
 
-
-        // Try to get image from contained directries image file
-        $parent = dirname($res['path']);
-        $possible_cover_filenames = [
-            'cover.jpg', 'cover.jpeg', 'cover.png', 'cover.bmp', 'cover.gif', 'cover.webp'
-        ];
-        $artworkPath = null;
-        foreach ($possible_cover_filenames as $tryfname) {
-            if (is_file($parent . '/' . $artworkPath)) {
-                $artworkPath = $parent . '/' . $artworkPath;
-                break;
+        try {
+            // Try to get image from contained directries image file
+            $parent = dirname($res['path']);
+            $possible_cover_filenames = [
+                'cover.jpg', 'cover.jpeg', 'cover.png', 'cover.bmp', 'cover.gif', 'cover.webp'
+            ];
+            $artworkPath = null;
+            foreach ($possible_cover_filenames as $tryfname) {
+                if (is_file($parent . '/' . $artworkPath)) {
+                    $artworkPath = $parent . '/' . $artworkPath;
+                    break;
+                }
             }
-        }
 
-        if ($artworkPath !== null) {
-            $response->header("Cache-Control", "max-age=604600, private");
-            $artObj = loadImageObjectAndResizeWidthAndConvertToConfiguratedFormatImageObject(array(
-                'data' => file_get_contents($artworkPath)
-            ), 1000);
-            writeImageObjectToResponse($artObj, $response);
-            writeImageObjectToTransformedStore($artObj, 'art.' . $request->fileId);
-            return;
-        }
+            if ($artworkPath !== null) {
+                $response->header("Cache-Control", "max-age=604600, private");
+                $artObj = loadImageObjectAndResizeWidthAndConvertToConfiguratedFormatImageObject(array(
+                    'data' => file_get_contents($artworkPath)
+                ), 1000);
+                writeImageObjectToResponse($artObj, $response);
+                writeImageObjectToTransformedStore($artObj, 'art.' . $request->fileId);
+                return;
+            }
 
-        // Try to get image from id3
-        $gid3 = new getID3;
-        $metadata = $gid3->analyze($res['path']);
+            // Try to get image from id3
+            $gid3 = new getID3;
+            $metadata = $gid3->analyze($res['path']);
 
-        if (!empty($metadata['comments']['picture'])) {
-            $firstPic = array_values($metadata['comments']['picture'])[0];
-            $response->header("Cache-Control", "max-age=604600, private");
-            $artObj = loadImageObjectAndResizeWidthAndConvertToConfiguratedFormatImageObject(array(
-                'data' => $firstPic['data'],
-            ), 1000);
-            writeImageObjectToResponse($artObj, $response);
-            writeImageObjectToTransformedStore($artObj, 'art.' . $request->fileId);
-            return;
+            if (!empty($metadata['comments']['picture'])) {
+                $firstPic = array_values($metadata['comments']['picture'])[0];
+                $response->header("Cache-Control", "max-age=604600, private");
+                $artObj = loadImageObjectAndResizeWidthAndConvertToConfiguratedFormatImageObject(array(
+                    'data' => $firstPic['data'],
+                ), 1000);
+                writeImageObjectToResponse($artObj, $response);
+                writeImageObjectToTransformedStore($artObj, 'art.' . $request->fileId);
+                return;
+            }
+        } catch (Exception) {
         }
 
         // Fallback
