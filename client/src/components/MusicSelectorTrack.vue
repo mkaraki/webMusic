@@ -25,6 +25,9 @@ function addItemsRecursive(url: string) {
 }
 
 onMounted(() => {
+    history.replaceState({
+        'view': ['album']
+    }, '', `/app/track`);
     addItemsRecursive(`/library/${libraryId}/track`);
 });
 
@@ -56,5 +59,20 @@ function sendSelectedTrackInfo(trackId: number) {
 
 
 <style scoped>
+.list-group, .list-group-item {
+    background-color: transparent;
+}
+
+.list-group-item {
+    color: white;
+}
+
+.list-group-item a {
+    color: white;
+}
+
+.list-group-item a:hover {
+    background-color: #333;
+}
 
 </style>

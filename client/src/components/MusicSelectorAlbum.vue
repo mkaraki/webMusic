@@ -14,6 +14,9 @@ const baseurl = baseurlGetter();
 const libraryIdGetter: any = inject('libraryId');
 const libraryId = libraryIdGetter();
 
+const props = defineProps<{
+    initialView: Array<string>
+}>();
 
 function addItemsRecursive(url: string) {
     fetch(baseurl + url, {
@@ -28,7 +31,13 @@ function addItemsRecursive(url: string) {
 }
 
 onMounted(() => {
+    history.replaceState({
+        'view': 'album'
+    }, '', `/app/album`);
     addItemsRecursive(`/library/${libraryId}/album`);
+
+    if (props.initialView.length > 1 && props.initialView[0] == 'album')
+        selectInspectItemById(props.initialView[1]);
 });
 
 function sendSelectedTrackInfo(trackId: number) {
@@ -40,8 +49,12 @@ const loading = ref(false);
 const inspectingAlbum = ref(null);
 
 function selectInspectItem(item: any) { 
+    selectInspectItemById(item['id']);
+}
+
+function selectInspectItemById(id: string|number) { 
     loading.value = true;
-    fetch(baseurl + `/library/${libraryId}/album/` + item['id'], {
+    fetch(baseurl + `/library/${libraryId}/album/` + id, {
         credentials: 'include'
     })
         .then(response => response.json())
@@ -51,6 +64,11 @@ function selectInspectItem(item: any) {
         .finally(() => { 
             loading.value = false;
         });
+}
+
+function onBackFromTrackSelector() { 
+    inspectingAlbum.value = null;
+    history.replaceState(null, '', `/app/album`);
 }
 
 </script>
@@ -84,7 +102,7 @@ function selectInspectItem(item: any) {
         </div>
     </div>
     <div v-else class="album-info">
-        <track-in-album-selecter :album="inspectingAlbum" class="album-info" v-on:back="inspectingAlbum = null"></track-in-album-selecter>
+        <track-in-album-selecter :album="inspectingAlbum" class="album-info" v-on:back="onBackFromTrackSelector"></track-in-album-selecter>
     </div>
 </template>
 

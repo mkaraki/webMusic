@@ -32,8 +32,13 @@ emitter.on('gotPlayingInformation', (i: any) => {
   coverUrl.value = srvbaseurl.value + i['artworkUrl'];
 });
 
+const viewInfo: Ref<Array<string>> = ref([]);
+
 emitter.on('changeView', (i: any) => {
-  selectorView.value = i;
+  displayPlaybackQueue.value = false;
+  const nextView = i.split(':');
+  viewInfo.value = nextView;
+  selectorView.value = nextView[0];
 });
 
 emitter.on('setPlaylist', (i: any) => {
@@ -83,15 +88,13 @@ function onTimeUpdate(time: number) {
   <select-library v-else-if="libraryId === null" v-on:on-library-selected="libraryId = $event"></select-library>
   <div v-else>
     <div class="queue-controller">
-      <playing-queue-controller :class="(displayPlaybackQueue ? '' : 'hide')"
+      <playing-queue-controller v-if="displayPlaybackQueue"
         :coverUrl="coverUrl"
         :playingNo="playingNo"
         :playlist="playlist"
         :current-time="playingTime"></playing-queue-controller>
-      <div :class="(displayPlaybackQueue ? 'hide' : '')">
-        <music-selector-track v-if="selectorView === 'track'" />
-        <music-selector-album v-else />
-      </div>
+      <music-selector-track v-else-if="selectorView === 'track'" />
+      <music-selector-album :initial-view="viewInfo" v-else />
     </div>
   
     <div class="controller">

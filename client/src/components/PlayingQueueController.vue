@@ -16,6 +16,16 @@ const playingControlToggle = ref(true);
 
 onMounted(() => {
     playingControlToggle.value = (localStorage.getItem('playQueueFullCover') ?? '0') !== '1';
+    history.pushState({
+        'view': ['queue'],
+        'opt': null
+    }, '', '/app/queue');
+    window.onpopstate = (e) => { 
+        if (e.state.view[0] !== 'queue') { 
+            emitter.emit('changeView', e.state.view.join(':'));
+            return;
+        }
+    };
 });
 
 function changeFullCover() {

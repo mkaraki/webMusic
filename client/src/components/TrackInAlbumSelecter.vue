@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
-import { defineEmits, inject } from 'vue'
+import { defineEmits, inject, onMounted } from 'vue'
 import SecondToTimeFormat from './SecondToTimeFormat.vue';
 import SelectorMenu from './SelectorMenu.vue';
 
@@ -11,7 +11,7 @@ const emit = defineEmits(['back']);
 const baseurlGetter: any = inject('baseurl');
 const baseurl = baseurlGetter();
 
-defineProps<{
+const props = defineProps<{
     album: any,
 }>()
 
@@ -29,6 +29,15 @@ function playQueue(trackList: Array<any>, track: any) {
 
     sendSelectedTrackInfo(track['id']);
 }
+
+onMounted(() => { 
+    history.replaceState({
+        'view': ['album', props.album['id']]
+    }, '', `/app/album/${props.album['id']}`);
+    window.onpopstate = () => {
+        emit('back');
+    };
+})
 
 </script>
 
@@ -53,7 +62,7 @@ function playQueue(trackList: Array<any>, track: any) {
                         <div class="list-group">
                             <a href="#" class="list-group-item list-group-item-action"
                                 v-for="track in album['track']" :key="track['id']"
-                                v-on:click="playQueue(album['track'], track)">
+                                v-on:click.prevent="playQueue(album['track'], track)">
                                 <div class="d-flex justify-content-between align-items-start w-100">
                                     <div class="me-auto track-information-holder">
                                         <div class="track-no-information-holder">
