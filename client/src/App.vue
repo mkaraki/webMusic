@@ -113,15 +113,26 @@ function onTimeUpdate(time: number) {
 
 .queue-controller,
 .queue-controller div {
-  height: calc(100vh - 100px);
+  height: calc(100vh - 70px);
   overflow-y: auto;
 }
 
 .controller {
   position: fixed;
-  height: 100px;
+  height: 70px;
   width: 100vw;
   bottom: 0;
   background-color: black;
+}
+
+@media screen and (max-width: 510px) {
+  .queue-controller,
+  .queue-controller div {
+    height: calc(100vh - 140px);
+  }
+  
+  .controller {
+    height: 140px;
+  }
 }
 </style>

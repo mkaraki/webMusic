@@ -17,17 +17,42 @@ const title = ref('');
 const albumName = ref('');
 const albumMbid = ref('');
 const artistMap = ref([]);
+const artistString = ref('');
 const coverurl = ref('');
 
 const loopMode = ref(0);
 
+const displayVolumeControl = ref(true);
+
 const player = new Audio();
+player.autoplay = false;
 player.ontimeupdate = function () { 
     pos.value = player.currentTime / player.duration;
     emit('onTimeUpdate', player.currentTime);
 }
 player.onended = function () { 
     emit('playbackEnded', loopMode.value == 2);
+}
+player.onplay = function () { 
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+        title: title.value,
+        artist: artistString.value,
+        album: albumName.value,
+        artwork: [
+            { src: coverurl.value },
+        ]
+        });
+                    
+        navigator.mediaSession.setActionHandler('play', togglePlaybackStete);
+        navigator.mediaSession.setActionHandler('pause', togglePlaybackStete);
+        navigator.mediaSession.setActionHandler('seekbackward', function() {});
+        navigator.mediaSession.setActionHandler('seekforward', function() {});
+        navigator.mediaSession.setActionHandler('previoustrack', function() {});
+        navigator.mediaSession.setActionHandler('nexttrack', function() {});
+    }
+
+    console.log('Playback started');
 }
 
 emitter.on('newTrackSelected', (t) => {
@@ -36,17 +61,21 @@ emitter.on('newTrackSelected', (t) => {
         credentials: 'include'
     })
         .then(response => response.json())
-        .then(res => { 
+        .then(res => {
+            player.src = url + '/file';
             title.value = res['title'];
             albumName.value = res['albumName'];
             albumMbid.value = res['releaseMbid'];
             artistMap.value = res['artist'];
-            player.src = url + '/file';
-            coverurl.value = baseurl + res['arddtworkUrl'];
+            artistString.value = res['artistString'];
+            coverurl.value = baseurl + res['artworkUrl'];
             pos.value = 0;
-            player.play();
 
             emitter.emit<any>('gotPlayingInformation', res);
+            setTimeout(function () {
+                player.load();
+                player.play();
+             }, 500);
         });
 });
 
@@ -71,8 +100,17 @@ function controller_playback_position_click(event: any) {
 }
 
 onMounted(() => {
-    const savedValue = localStorage.getItem('playerVolume') ?? '1';
-    player.volume = parseFloat(savedValue);
+    if (
+        navigator.userAgent.includes('Android') ||
+        navigator.userAgent.includes('iOS')
+    ) {
+        player.volume = 1;
+        displayVolumeControl.value = false;
+    }
+    else { 
+        const savedValue = localStorage.getItem('playerVolume') ?? '1';
+        player.volume = parseFloat(savedValue);
+    }
 
     loopMode.value = parseInt(localStorage.getItem('playerLoop') ?? '0');
     player.loop = (loopMode.value == 1);
@@ -94,21 +132,19 @@ function saveVolume(event: any) {
             </div>
         </div>
 
-        <div class="d-flex justify-content-between">
+        <div class="d-flex flex-wrap justify-content-between">
             <div class="controller-playback-mediainfo-holder">
                 <div class="controller-playback-mediainfo-image-holder">
                     <img :src="coverurl" alt="Coverart" class="img-fluid">
                 </div>
                 <div class="controller-playback-mediainfo-text-holder">
                     <p class="controller-playback-mediainfo-title">{{ title }}</p>
-                    <p class="controller-playback-mediainfo-album">{{ albumName }}</p>
-                    <p class="controller-playback-mediainfo-artist">
-                        <artist-map-to-linked-text :artists="artistMap"></artist-map-to-linked-text>
+                    <p class="controller-playback-mediainfo-from">{{ albumName }} ・ <artist-map-to-linked-text :artists="artistMap"></artist-map-to-linked-text>
                     </p>
                 </div>
             </div>
             <div class="controller-playback-control-holder">
-                <div class="controller-playback-control-volume-control">
+                <div class="controller-playback-control-volume-control" v-if="displayVolumeControl">
                     <div class="controller-playback-control-volume-holder">
                         <input type="range" max="1" min="0" step="0.02"
                             v-model="player.volume"
@@ -145,9 +181,10 @@ function saveVolume(event: any) {
 </template>
 
 <style scoped>
+
 .controller-playback-position-holder {
-    height: 15px;
-    padding-bottom: 10px;
+    height: 5px;
+    padding-bottom: 0px;
     cursor: pointer;
 }
 
@@ -171,7 +208,7 @@ function saveVolume(event: any) {
 }
 
 .controller-playback-mediainfo-holder {
-    height: 85px;
+    height: 65px;
     padding: 5px;
 }
 
@@ -197,8 +234,7 @@ function saveVolume(event: any) {
     font-size: x-large;
 }
 
-.controller-playback-mediainfo-album,
-.controller-playback-mediainfo-artist {
+.controller-playback-mediainfo-from {
     font-size: smaller;
     color: darkgray
 }
@@ -214,20 +250,21 @@ function saveVolume(event: any) {
 .controller-playback-control-button {
     border: none;
     background: none;
-    color: white;
-    font-size: 32pt;
+    color: lightgray;
+    font-size: 28pt;
 }
 
 .controller-playback-control-volume-holder {
     float: left;
     display: none;
     position: abosolute;
-    margin-top: 20px;
+    margin-top: 18px;
     height: 10px;
 }
 
 .controller-playback-control-volume-holder input[type=range] {
     height: 10px;
+    width: 80px;
 }
 
 .controller-playback-control-volume-control:hover .controller-playback-control-volume-holder {
@@ -236,5 +273,17 @@ function saveVolume(event: any) {
 
 .grayout {
     color: gray;
+}
+
+@media screen and (max-width: 510px) {
+    .controller-playback-mediainfo-holder {
+        width: 100vw;
+    }
+
+    .controller-playback-control-holder {
+        margin-right: 0;
+        margin: auto;
+        text-align: center;
+    }
 }
 </style>

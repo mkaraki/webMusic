@@ -185,6 +185,11 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:trackId]', function ($re
         $res['id']
     );
 
+    $res['artistString'] = '';
+    foreach ($res['artist'] as $ar) {
+        $res['artistString'] .= $ar['dispName'] . $ar['joinPhrase'];
+    }
+
     setCors($request, $response);
     $response->json($res);
 });

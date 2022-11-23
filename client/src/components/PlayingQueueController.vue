@@ -97,7 +97,7 @@ const tabMode = ref('playlist');
                                                 </div>
                                             </div>
                                         </div>
-                                        <second-to-time-format :duration="track['duration']"></second-to-time-format>
+                                        <second-to-time-format :duration="parseInt(track['duration'])"></second-to-time-format>
                                     </div>
                                 </a>
                             </div>

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-defineProps<{
+const props = defineProps<{
     duration: number
 }>();
+
 
 </script>
 

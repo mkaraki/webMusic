@@ -46,7 +46,6 @@ function selectInspectItem(item: any) {
     })
         .then(response => response.json())
         .then(r => {
-            console.log(r);
             inspectingAlbum.value = r;
         })
         .finally(() => { 
@@ -64,7 +63,7 @@ function selectInspectItem(item: any) {
                 <selector-menu current-view="album" :back-disabled="true"></selector-menu>
             </div>
         </div>
-        <div class="row g-4">
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-6 row-cols-lg-6 row-cols-xl-6 row-cols-xxl12 g-6">
             <div class="col" v-for="item in items" :key="item['id']">
                 <div class="card h-100">
                     <a v-on:click="selectInspectItem(item)" href="#">
@@ -80,7 +79,6 @@ function selectInspectItem(item: any) {
                             <artist-map-to-linked-text :artists="item['artist']" :link="false"/>
                         </p>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -103,7 +101,6 @@ function selectInspectItem(item: any) {
 
 .card, .card-body {
     background-color: transparent;
-    width: 210px;
 }
 
 </style>
