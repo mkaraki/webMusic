@@ -13,7 +13,7 @@ const libraryId = libraryIdGetter();
 
 const pos = ref(0.0);
 
-const title = ref('');
+const title = ref('Not playing');
 const albumName = ref('');
 const albumMbid = ref('');
 const artistMap = ref([]);
