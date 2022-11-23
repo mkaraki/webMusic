@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, onMounted, ref } from 'vue'
+import { inject, onMounted, Ref, ref } from 'vue'
 import { emitter } from '../emitter';
 import ArtistMapToLinkedText from './ArtistMapToLinkedText.vue';
 
@@ -71,8 +71,10 @@ emitter.on('newTrackSelected', (t) => {
             coverurl.value = baseurl + res['artworkUrl'];
             pos.value = 0;
 
+            
             emitter.emit<any>('gotPlayingInformation', res);
             setTimeout(function () {
+                setMarqueeEnabled();
                 player.load();
                 player.play();
              }, 500);
@@ -116,6 +118,23 @@ onMounted(() => {
     player.loop = (loopMode.value == 1);
 });
 
+window.onresize = setMarqueeEnabled;
+
+const elm_mediainfo_text_holder: Ref<any> = ref(null);
+const elm_mediainfo_title: Ref<any> = ref(null);
+const elm_mediainfo_from: Ref<any> = ref(null);
+
+function setMarqueeEnabled() { 
+    if (elm_mediainfo_text_holder.value.offsetWidth < elm_mediainfo_title.value.offsetWidth)
+        elm_mediainfo_title.value.classList.add('marquee');
+    else
+        elm_mediainfo_title.value.classList.remove('marquee');
+
+    if (elm_mediainfo_text_holder.value.offsetWidth < elm_mediainfo_from.value.offsetWidth)
+        elm_mediainfo_from.value.classList.add('marquee');
+    else
+        elm_mediainfo_from.value.classList.remove('marquee');
+}
 
 function saveVolume(event: any) { 
     const volume = event.target.value;
@@ -137,9 +156,9 @@ function saveVolume(event: any) {
                 <div class="controller-playback-mediainfo-image-holder">
                     <img :src="coverurl" alt="Coverart" class="img-fluid">
                 </div>
-                <div class="controller-playback-mediainfo-text-holder">
-                    <p class="controller-playback-mediainfo-title">{{ title }}</p>
-                    <p class="controller-playback-mediainfo-from">{{ albumName }} ・ <artist-map-to-linked-text :artists="artistMap"></artist-map-to-linked-text>
+                <div class="controller-playback-mediainfo-text-holder" ref="elm_mediainfo_text_holder">
+                    <p class="controller-playback-mediainfo-title" ref="elm_mediainfo_title">{{ title }}</p><br />
+                    <p class="controller-playback-mediainfo-from" ref="elm_mediainfo_from">{{ albumName }} ・ <artist-map-to-linked-text :artists="artistMap"></artist-map-to-linked-text>
                     </p>
                 </div>
             </div>
@@ -218,15 +237,36 @@ function saveVolume(event: any) {
 
 .controller-playback-mediainfo-image-holder {
     height: 100%;
+    width: 55px;
     margin-right: 15px;
 }
 
 .controller-playback-mediainfo-image-holder img {
     height: 100%;
+    width: 100%;
+    object-fit: contain;
 }
 
-.controller-playback-mediainfo-text-holder p {
+.controller-playback-mediainfo-text-holder{
+    width: calc(calc(100vw - 80px) - 220px);
+    overflow: hidden;
+}
+
+.controller-playback-mediainfo-text-holder>p {
     margin: 0;
+    display: inline-block;
+    white-space:nowrap;
+}
+
+.controller-playback-mediainfo-text-holder>p.marquee {
+  animation: marquee linear 8s infinite;
+}
+
+@keyframes marquee {
+  0%   { transform: translate(0%);}
+  20%   { transform: translate(0%);}
+  90% { transform: translate(-100%);}
+  100% { transform: translate(-100%);}
 }
 
 .controller-playback-mediainfo-title {
@@ -238,6 +278,8 @@ function saveVolume(event: any) {
     font-size: smaller;
     color: darkgray
 }
+
+
 
 .controller-playback-control-holder {
     margin-right: 15px;
@@ -278,6 +320,10 @@ function saveVolume(event: any) {
 @media screen and (max-width: 510px) {
     .controller-playback-mediainfo-holder {
         width: 100vw;
+    }
+
+    .controller-playback-mediainfo-text-holder{
+        width: calc(100vw - 80px);
     }
 
     .controller-playback-control-holder {
