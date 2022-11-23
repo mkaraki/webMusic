@@ -31,7 +31,7 @@ player.ontimeupdate = function () {
     emit('onTimeUpdate', player.currentTime);
 }
 player.onended = function () { 
-    emit('playbackEnded', loopMode.value == 2);
+    goNext();
 }
 player.onplay = function () { 
     if ('mediaSession' in navigator) {
@@ -53,6 +53,10 @@ player.onplay = function () {
     }
 
     console.log('Playback started');
+}
+
+function goNext() { 
+    emit('playbackEnded', loopMode.value == 2);
 }
 
 emitter.on('newTrackSelected', (t) => {
@@ -94,6 +98,8 @@ function toggleLoopState() {
         loopMode.value = 0;
         
     player.loop = (loopMode.value == 1);
+
+    localStorage.setItem('playerLoop', loopMode.value.toString());
 }
 
 function controller_playback_position_click(event: any) {
@@ -184,6 +190,10 @@ function saveVolume(event: any) {
                         <i v-else class="bi bi-play-fill"></i>
                     </button>
                     <button class="controller-playback-control-button"
+                        v-on:click="goNext">
+                        <i class="bi bi-skip-forward-fill"></i>
+                    </button>
+                    <button class="controller-playback-control-button"
                         v-on:click="toggleLoopState">
                         <i v-if="loopMode === 1" class="bi bi-repeat-1"></i>
                         <i v-else-if="loopMode === 2" class="bi bi-repeat"></i>
@@ -248,7 +258,7 @@ function saveVolume(event: any) {
 }
 
 .controller-playback-mediainfo-text-holder{
-    width: calc(calc(100vw - 80px) - 300px);
+    width: calc(calc(100vw - 80px) - 290px);
     overflow: hidden;
 }
 
@@ -292,8 +302,9 @@ function saveVolume(event: any) {
 .controller-playback-control-button {
     border: none;
     background: none;
-    color: lightgray;
-    font-size: 28pt;
+    color: white;
+    font-size: 20pt;
+    padding-top: 10px;
 }
 
 .controller-playback-control-volume-holder {
