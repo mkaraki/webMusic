@@ -139,12 +139,12 @@ const tabMode = ref('playlist');
     background-size: cover;
     background-position: center center;
     position: absolute;
-    top: -50px;
-    left: -50px;
-    right: 50px;
-    bottom: 50px;
+    top: 0px;
+    left: 15px;
+    right: 15px;
+    bottom: 0px;
     filter:
-        blur(40px) brightness(30%);
+        blur(40px) brightness(70%);
     z-index: 0;
 }
 
@@ -176,7 +176,7 @@ const tabMode = ref('playlist');
     padding: 50px;
     height: 100%;
 
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.75);
 }
 
 div:has(.playing-control-container-toggler) {
