@@ -1,0 +1,2 @@
+ALTER TABLE user
+ADD listenBrainzKey CHAR(36) DEFAULT(NULL);

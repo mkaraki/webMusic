@@ -18,11 +18,10 @@ WORKDIR /app
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 RUN install-php-extensions gd
 
-RUN touch /app/_config.php
 COPY server/.htaccess /app/
 COPY server/index.php /app/
 COPY server/_config.php /app/
-COPY server/init.db/database.sql /app/init.db/
+COPY server/init.db/* /app/init.db/
 COPY server/composer.* /app/
 COPY server/api /app/api
 COPY server/ui /app/ui
@@ -59,3 +58,4 @@ EOF
 
 COPY --from=require-server /app /var/www/html
 COPY --from=build-webapp /app/dist /var/www/html/public
+RUN mkdir /var/www/html/cache

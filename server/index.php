@@ -80,5 +80,6 @@ $klein->respond('GET', '/version', function ($request, $response) {
 require_once(__DIR__ . '/ui/router.php');
 
 require_once(__DIR__ . '/api/library.php');
+require_once(__DIR__ . '/api/history.php');
 
 $klein->dispatch();

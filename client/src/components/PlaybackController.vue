@@ -13,6 +13,7 @@ const libraryId = libraryIdGetter();
 
 const pos = ref(0.0);
 
+const trackId: Ref<string|number> = ref('');
 const title = ref('Not playing');
 const albumName = ref('');
 const albumMbid = ref('');
@@ -29,6 +30,18 @@ player.autoplay = false;
 player.ontimeupdate = function () { 
     pos.value = player.currentTime / player.duration;
     emit('onTimeUpdate', player.currentTime);
+
+    if (!scrobbleSent.value && pos.value >= 0.5) { 
+        scrobbleSent.value = true;
+        fetch(`${baseurl}/history`, {
+            credentials: 'include',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `id=${trackId.value}`
+        });
+    }
 }
 player.onended = function () { 
     goNext();
@@ -59,6 +72,8 @@ function goNext() {
     emit('playbackEnded', loopMode.value == 2);
 }
 
+const scrobbleSent = ref(true);
+
 emitter.on('newTrackSelected', (t) => {
     const url = baseurl + `/library/${libraryId}/track/` + t;
     fetch(url, {
@@ -67,6 +82,7 @@ emitter.on('newTrackSelected', (t) => {
         .then(response => response.json())
         .then(res => {
             player.src = url + '/file';
+            trackId.value = res['id'];
             title.value = res['title'];
             albumName.value = res['albumName'];
             albumMbid.value = res['releaseMbid'];
@@ -81,6 +97,7 @@ emitter.on('newTrackSelected', (t) => {
                 setMarqueeEnabled();
                 player.load();
                 player.play();
+                scrobbleSent.value = false;
              }, 500);
         });
 });

@@ -10,7 +10,8 @@ $target_tables = [
     'artistMetadata',
     'releaseMetadata',
     'track',
-    'artistMap'
+    'artistMap',
+    'dbInfo'
 ];
 
 foreach (array_reverse($target_tables) as $table) {

@@ -149,7 +149,6 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:trackId]', function ($re
         return null;
     }
 
-    $page = $request->paramsGet()['page'] ?? 1;
     $res = DB::queryFirstRow(
         'SELECT
             t.id AS id,
