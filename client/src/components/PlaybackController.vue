@@ -248,7 +248,7 @@ function saveVolume(event: any) {
 }
 
 .controller-playback-mediainfo-text-holder{
-    width: calc(calc(100vw - 80px) - 220px);
+    width: calc(calc(100vw - 80px) - 300px);
     overflow: hidden;
 }
 

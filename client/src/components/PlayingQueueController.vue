@@ -20,8 +20,8 @@ onMounted(() => {
         'view': ['queue'],
         'opt': null
     }, '', '/app/queue');
-    window.onpopstate = (e) => { 
-        if (e.state.view[0] !== 'queue') { 
+    window.onpopstate = (e) => {
+        if (e.state.view[0] !== 'queue') {
             emitter.emit('changeView', e.state.view.join(':'));
             return;
         }
@@ -53,67 +53,74 @@ const tabMode = ref('playlist');
 </script>
 
 <template>
-    <div class="container-fluid">
-        <div class="row">
-            <div :class="playingControlToggle ? 'col-12 col-lg-6' : 'col-12'"
-                :style="{ '--bgImage': 'url(' + coverUrl + ')' }" id="art">
-                <div class="playing-coverart d-flex justify-content-center align-items-center">
-                    <img :src="coverUrl" alt="Coverart" class="img-fluid">
-                </div>
-
-                <div class="playing-control-container-toggler">
-                    <a class="btn btn-light" v-on:click="changeFullCover"
-                        :href="playingControlToggle ? '#queue' : '#art'">
-                        <i class="bi bi-list"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-12 col-lg-6 playlist-control-container" v-if="playingControlToggle" id="queue">
-                <div class="information-container">
-                    <div>
-                        <ul class="nav nav-tabs">
-                            <li class="nav-item">
-                                <a :class="'nav-link ' + (tabMode === 'playlist' ? 'active' : '')" href="#"
-                                    v-on:click="tabMode = 'playlist'">Playlist</a>
-                            </li>
-                            <li class="nav-item">
-                                <a :class="'nav-link ' + (tabMode === 'lyric' ? 'active' : '')" href="#" v-on:click="tabMode = 'lyric'">Lyric</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="inner-information-container">
-                        <div v-if="tabMode === 'lyric'">
-                            <lyric-view :track-id="playlist[playingNo]['id']" :key="playlist[playingNo]['id']" :current-time="currentTime"></lyric-view>
+    <div :style="{ '--bgImage': 'url(' + coverUrl + ')' }">
+        <div class="base-holder">
+            <div class="content-holder">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div :class="playingControlToggle ? 'col-12 col-lg-6' : 'col-12'" id="art">
+                            <div class="playing-coverart d-flex justify-content-center align-items-center">
+                                <img :src="coverUrl" alt="Coverart" class="img-fluid">
+                            </div>
                         </div>
-                        <div v-else>
-                            <div class="list-group">
-                                <a href="#"
-                                    :class="'list-group-item ' + (playlist[playingNo]['id'] === track['id'] ? 'active' : 'list-group-item-action')"
-                                    v-for="(track, index) in playlist" :key="track['id']"
-                                    v-on:click="playQueue(playlist, track)">
-                                    <div class="d-flex justify-content-between align-items-start w-100">
-                                        <div class="me-auto track-information-holder">
-                                            <div class="track-no-information-holder">
-                                                {{ index  + 1 }}.
-                                            </div>
-                                            <div>
-                                                <div>
-                                                    {{ track['title'] }}
-                                                </div>
-                                                <div class="artist-information-holder">
-                                                    <artist-map-to-linked-text :artists="track['artist']">
-                                                    </artist-map-to-linked-text>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <second-to-time-format :duration="parseInt(track['duration'])"></second-to-time-format>
+
+                        <div class="col-12 col-lg-6 playlist-control-container" v-if="playingControlToggle" id="queue">
+                            <div class="information-container">
+                                <div>
+                                    <ul class="nav nav-tabs">
+                                        <li class="nav-item">
+                                            <a :class="'nav-link ' + (tabMode === 'playlist' ? 'active' : '')" href="#"
+                                                v-on:click="tabMode = 'playlist'">Playlist</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a :class="'nav-link ' + (tabMode === 'lyric' ? 'active' : '')" href="#"
+                                                v-on:click="tabMode = 'lyric'">Lyric</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="inner-information-container">
+                                    <div v-if="tabMode === 'lyric'">
+                                        <lyric-view :track-id="playlist[playingNo]['id']"
+                                            :key="playlist[playingNo]['id']" :current-time="currentTime"></lyric-view>
                                     </div>
-                                </a>
+                                    <div v-else>
+                                        <div class="list-group">
+                                            <a href="#"
+                                                :class="'list-group-item ' + (playlist[playingNo]['id'] === track['id'] ? 'active' : 'list-group-item-action')"
+                                                v-for="(track, index) in playlist" :key="track['id']"
+                                                v-on:click="playQueue(playlist, track)">
+                                                <div class="d-flex justify-content-between align-items-start w-100">
+                                                    <div class="me-auto track-information-holder">
+                                                        <div class="track-no-information-holder">
+                                                            {{ index + 1 }}.
+                                                        </div>
+                                                        <div>
+                                                            <div>
+                                                                {{ track['title'] }}
+                                                            </div>
+                                                            <div class="artist-information-holder">
+                                                                <artist-map-to-linked-text :artists="track['artist']">
+                                                                </artist-map-to-linked-text>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <second-to-time-format :duration="parseInt(track['duration'])">
+                                                    </second-to-time-format>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="playing-control-container-toggler">
+                <a class="btn btn-light" v-on:click="changeFullCover"
+                    :href="playingControlToggle ? '#queue' : '#art'">
+                    <i class="bi bi-list"></i>
+                </a>
             </div>
         </div>
     </div>
@@ -121,31 +128,41 @@ const tabMode = ref('playlist');
 
 
 <style scoped>
+.base-holder {
+    height: 100%;
+}
+
+.base-holder:before {
+    content: '';
+    background-image: var(--bgImage) !important;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    right: 50px;
+    bottom: 50px;
+    filter:
+        blur(40px) brightness(30%);
+    z-index: 0;
+}
+
+.content-holder {
+    height: 100%;
+    overflow-y: auto;
+}
+
 .container-fluid,
 .container-fluid .row {
-    height: calc(100vh - 100px);
+    position: relative;
+    height: 100%;
 }
 
 .playing-coverart {
     height: calc(100vh - 100px);
     z-index: 0;
     position: relative;
-}
-
-.playing-coverart:before {
-    content: '';
-    background-image: var(--bgImage);
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center center;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    filter:
-        blur(40px) brightness(30%);
-    z-index: -1;
 }
 
 .playing-coverart img {
@@ -158,6 +175,8 @@ const tabMode = ref('playlist');
 .playlist-control-container {
     padding: 50px;
     height: 100%;
+
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 div:has(.playing-control-container-toggler) {
@@ -166,13 +185,11 @@ div:has(.playing-control-container-toggler) {
 
 .playing-control-container-toggler a {
     position: absolute;
-    bottom: 15px;
-    right: 15px;
+    bottom: 10px;
+    right: 25px;
 }
 
 .information-container {
-    padding-left: 50px;
-    padding-right: 50px;
     height: 100%;
 }
 
