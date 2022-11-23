@@ -304,7 +304,7 @@ function saveVolume(event: any) {
     background: none;
     color: white;
     font-size: 20pt;
-    padding-top: 10px;
+    margin-top: 10px;
 }
 
 .controller-playback-control-volume-holder {

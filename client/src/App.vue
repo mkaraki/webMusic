@@ -19,11 +19,11 @@ const selectorView = ref('album');
 emitter.on('logout', () => {
   localStorage.removeItem('lastConnectedServer');
   localStorage.removeItem('lastLibrary');
-  document.cookie ='auth=0; Max-Age=0'
+  document.cookie = 'auth=0; Max-Age=0'
   srvbaseurl.value = '';
 });
 
-emitter.on('changeLibrary', () => { 
+emitter.on('changeLibrary', () => {
   localStorage.removeItem('lastLibrary');
   libraryId.value = null;
 });
@@ -53,7 +53,7 @@ const playingNo = ref(0);
 
 const srvbaseurl = ref('');
 
-const libraryId: Ref<null|number> = ref(null);
+const libraryId: Ref<null | number> = ref(null);
 
 provide('baseurl', function () {
   return srvbaseurl.value;
@@ -63,16 +63,26 @@ provide('libraryId', function () {
   return libraryId.value;
 });
 
-function playbackEnded(isLoop: boolean = false) { 
+function playbackEnded(isLoop: boolean = false) {
   playingNo.value++;
 
   if (playingNo.value < playlist.value.length) {
     emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
   }
-  else { 
+  else if (isLoop) {
     playingNo.value = 0;
-    if (isLoop)
-      emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
+    emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
+    return;
+  }
+  else {
+    fetch(`${srvbaseurl.value}/library/${libraryId.value}/random/track`, {
+      credentials: 'include'
+    })
+      .then(data => data.json())
+      .then(data => {
+        playlist.value = playlist.value.concat(data);
+        emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
+      });
   }
 }
 
@@ -88,21 +98,15 @@ function onTimeUpdate(time: number) {
   <select-library v-else-if="libraryId === null" v-on:on-library-selected="libraryId = $event"></select-library>
   <div v-else>
     <div class="queue-controller">
-      <playing-queue-controller v-if="displayPlaybackQueue"
-        :coverUrl="coverUrl"
-        :playingNo="playingNo"
-        :playlist="playlist"
-        :current-time="playingTime"></playing-queue-controller>
+      <playing-queue-controller v-if="displayPlaybackQueue" :coverUrl="coverUrl" :playingNo="playingNo"
+        :playlist="playlist" :current-time="playingTime"></playing-queue-controller>
       <music-selector-track v-else-if="selectorView === 'track'" />
       <music-selector-album :initial-view="viewInfo" v-else />
     </div>
-  
+
     <div class="controller">
-      <playback-controller 
-        v-on:toggle-playback-queue="displayPlaybackQueue = !displayPlaybackQueue"
-        v-on:playback-ended="playbackEnded"
-        v-on:on-time-update="onTimeUpdate"
-        ></playback-controller>
+      <playback-controller v-on:toggle-playback-queue="displayPlaybackQueue = !displayPlaybackQueue"
+        v-on:playback-ended="playbackEnded" v-on:on-time-update="onTimeUpdate"></playback-controller>
     </div>
   </div>
 
@@ -129,11 +133,12 @@ function onTimeUpdate(time: number) {
 }
 
 @media screen and (max-width: 510px) {
+
   .queue-controller,
   .queue-controller div {
     height: calc(100vh - 140px);
   }
-  
+
   .controller {
     height: 140px;
   }

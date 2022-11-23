@@ -73,7 +73,7 @@ $klein->respond('/[|app:entry]', function ($request, $response) {
 
 $klein->respond('GET', '/version', function ($request, $response) {
     $response->json(array(
-        'api' => 2022_11_23_00002
+        'api' => 2022_11_23_00003
     ));
 });
 

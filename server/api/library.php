@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/library_random.php';
+
 function checkUserHavePermissionToAccessLibrary(int $userId, int $libraryId): int
 {
     global $useapcu;
