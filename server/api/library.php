@@ -156,8 +156,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track/[i:trackId]', function ($re
             t.duration AS duration,
             t.diskNo AS diskNo,
             t.trackNo AS trackNo,
-            rM.title AS albumName,
-            rM.artworkColor AS artworkColor
+            rM.title AS albumName
             FROM
                 track t,
                 releaseMetadata rM
@@ -205,8 +204,7 @@ $klein->respond('GET', '/library/[i:libraryId]/album/[i:id]', function ($request
     $res = DB::queryFirstRow(
         'SELECT
             t.releaseId AS id,
-            rM.title AS albumName,
-            rM.artworkColor AS artworkColor
+            rM.title AS albumName
             FROM
                 track t,
                 releaseMetadata rM

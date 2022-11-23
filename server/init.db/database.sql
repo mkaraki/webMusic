@@ -39,7 +39,6 @@ CREATE TABLE IF NOT EXISTS releaseMetadata(
     title TEXT,
     titlePhonic TEXT,
     artworkPath TEXT,
-    artworkColor VARCHAR(6) DEFAULT(NULL),
     releaseDate DATE,
     disambiguation LONGTEXT,
     FOREIGN KEY(libraryId) REFERENCES library(id)

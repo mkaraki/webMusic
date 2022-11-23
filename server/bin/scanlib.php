@@ -197,25 +197,12 @@ foreach ($libs as $libinfo) {
                         'https://coverartarchive.org/release/' . $releaseInfo['id'] . '/front' :
                         null;
 
-                    $artworkColor = null;
-
-                    if (str_starts_with($artworkPath, 'http')) {
-                        sleep(2);
-                        $img = mbGet($artworkPath);
-                        if (strlen($img) <= 30_000_000) {
-                            $palette = Palette::fromContents($img);
-                            $artworkColor = Color::fromIntToHex(current($palette->getMostUsedColors(1)), false);
-                            $palette = null;
-                        }
-                    }
-
                     DB::insert('releaseMetadata', [
                         'libraryId' => $libinfo['id'],
                         'releaseMbid' => $releaseInfo['id'],
                         'title' => $releaseInfo['title'],
                         'titlePhonic' => $releaseInfo['title'],
                         'artworkPath' => $artworkPath,
-                        'artworkColor' => $artworkColor,
                         'releaseDate' => $releaseInfo['date'],
                         'disambiguation' => $releaseInfo['disambiguation'],
                     ]);
