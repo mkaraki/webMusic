@@ -49,6 +49,14 @@ $klein->respond('/app/[**:path]', function ($request, $response) {
             $response->header('Content-Type', 'text/css');
             break;
 
+        case "webmanifest":
+            $response->header('Content-Type', 'application/manifest+json');
+            break;
+
+        case "svg":
+            $response->header('Content-Type', 'image/svg+xml');
+            break;
+
         default:
             $response->header('Content-Type', mime_content_type($path));
             break;
