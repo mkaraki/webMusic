@@ -4,7 +4,7 @@ function loginAndExtendTokenExpire(string $token): null|int
 {
     $tokenSession = null;
 
-    if (apcu_exists('token/' . $token)) {
+    if (apcu_exists('token/' . $token))
         $tokenSession = apcu_fetch('token/' . $token);
         
     if ($tokenSession === null) {
