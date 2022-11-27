@@ -17,8 +17,15 @@ export default defineConfig({
         icons: [
           {
             src: 'favicon.svg',
-            type: 'image/svg+xml'
-          }
+            type: 'image/svg+xml',
+            sizes: '300x300',
+          },
+          {
+            src: 'favicon.svg',
+            type: 'image/svg+xml',
+            sizes: '300x300',
+            purpose: 'maskable',
+          },
         ]
       }
     })
