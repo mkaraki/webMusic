@@ -17,7 +17,7 @@ COPY client /app
 WORKDIR /app
 
 RUN pnpm install --dev
-#RUN pnpm install vue-tsc
+RUN pnpm install vue-tsc
 RUN pnpm build
 
 
