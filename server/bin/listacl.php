@@ -1,4 +1,8 @@
 <?php
+/*
+ * List access list for library
+ * Usage: listacl.php
+ */
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../_config.php';
 

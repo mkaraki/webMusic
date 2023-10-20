@@ -108,6 +108,7 @@ $klein->respond('GET', '/library/[i:libraryId]/track', function ($request, $resp
             t.duration AS duration,
             t.diskNo AS diskNo,
             t.trackNo AS trackNo,
+            t.releaseId AS albumId,
             rM.title AS albumName
             FROM
                 track t,

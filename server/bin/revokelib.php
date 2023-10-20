@@ -1,9 +1,13 @@
 <?php
+/*
+ * Revoke library access from user
+ * Usage: revokelib.php username libraryId
+ */
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../_config.php';
 
 if (count($argv) != 3) {
-    die('Usage: grantlib.php "username" "library id"');
+    die('Usage: revokelib.php "username" "library id"');
 }
 
 $userinfo = DB::queryFirstRow('SELECT id FROM user WHERE username=%s', $argv[1]);

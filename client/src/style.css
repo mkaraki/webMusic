@@ -6,3 +6,19 @@ html {
   color: white;
   background-color: #242424;
 }
+
+.d-flex-fullscreen {
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+.login-dialog {
+  background-color: #DDD;
+  color: black;
+  padding: 30px;
+  min-width: 250px;
+}
+
+button.btn {
+  margin-right: 5px;
+}

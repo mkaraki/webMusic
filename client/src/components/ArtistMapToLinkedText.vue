@@ -1,19 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useRoute } from 'vue-router';
+const route = useRoute();
+const libraryId = route.params.libraryId;
 
 defineProps<{
     artists: Array<any>,
-    link?: Boolean
 }>()
 
 </script>
 
 <template>
     <span v-for="artist in artists" :key="artist['sequence']">
-        <a v-if="link ?? true">{{artist['dispName']}}</a>
-        <span v-else>{{artist['dispName']}}</span>{{artist['joinPhrase']}}
+        <RouterLink :to="`/library/${libraryId}/artist/${artist['artistId']}`">{{ artist['dispName'] }}</RouterLink>{{
+            artist['joinPhrase'] }}
     </span>
 </template>
-
-<style>
-</style>

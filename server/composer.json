@@ -1,11 +1,17 @@
 {
     "require": {
         "league/color-extractor": "^0.4.0",
-        "klein/klein": "^2.1",
+        "klein/klein": "dev-master",
         "sergeytsalkov/meekrodb": "^2.4",
         "aminyazdanpanah/php-ffmpeg-video-streaming": "^1.2",
         "james-heinrich/getid3": "^1.9",
         "twbs/bootstrap": "5.0.2",
         "vlucas/phpdotenv": "^5.5"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/mkaraki/klein.php"
+        }
+    ]
 }
