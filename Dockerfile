@@ -1,4 +1,13 @@
 # syntax = docker/dockerfile:1.4.0
+FROM composer AS require-server
+
+WORKDIR /app
+
+COPY server/composer.* /app/
+
+RUN composer install --no-dev --ignore-platform-reqs
+
+
 FROM node:18-bullseye AS build-webapp
 
 RUN npm install -g pnpm
@@ -7,33 +16,16 @@ COPY client /app
 
 WORKDIR /app
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --dev
+#RUN pnpm install vue-tsc
 RUN pnpm build
-
-
-FROM composer AS require-server
-
-WORKDIR /app
-
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions gd
-
-COPY server/.htaccess /app/
-COPY server/index.php /app/
-COPY server/_config.php /app/
-COPY server/init.db/* /app/init.db/
-COPY server/composer.* /app/
-COPY server/api /app/api
-COPY server/ui /app/ui
-COPY server/bin/*.php /app/bin/
-
-RUN composer install --no-dev
 
 
 FROM php:apache
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+ENV IPE_GD_WITHOUTAVIF=1
 RUN install-php-extensions gd mysqli
 RUN pecl install apcu \
     && docker-php-ext-install opcache \
@@ -56,6 +48,15 @@ SetEnv DB_NAME \${DB_NAME}
 SetEnv CORS_ORIGIN \${CORS_ORIGIN}
 EOF
 
-COPY --from=require-server /app /var/www/html
+COPY --from=require-server /app/vendor /var/www/html/vendor
 COPY --from=build-webapp /app/dist /var/www/html/public
+
+COPY server/.htaccess /var/www/html/
+COPY server/index.php /var/www/html/
+COPY server/_config.php /var/www/html/
+COPY server/init.db/* /var/www/html/init.db/
+COPY server/api /var/www/html/api/
+COPY server/ui /var/www/html/ui/
+COPY server/bin/*.php /var/www/html/bin/
+
 RUN mkdir /var/www/html/cache

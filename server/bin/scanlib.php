@@ -1,4 +1,9 @@
 <?php
+/*
+ * Library Scanner
+ * Usage: scanlib.php
+ */
+
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../_config.php';
 

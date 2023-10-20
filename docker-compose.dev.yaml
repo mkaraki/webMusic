@@ -2,8 +2,8 @@ version: '3'
 
 services:
   webmusic:
-    #build: .
-    image: webmusic:latest
+    build: .
+      #image: webmusic:latest
     environment:
       - DB_HOST=db
       - DB_USER=webmusic
@@ -13,7 +13,7 @@ services:
     ports:
       - 7070:80
     volumes:
-      - ./client/dist:/var/www/html/public
+      - ./client/dist:/var/www/html/app
       - ./server:/var/www/html
       - ./musics:/music:ro
 
