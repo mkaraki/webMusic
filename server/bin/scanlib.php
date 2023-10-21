@@ -150,7 +150,8 @@ foreach ($libs as $libinfo) {
             'disk_number' => $primary_meta_provider['discnumber'][0] ?? 0,
             'album_artist' => $primary_meta_provider['albumartist'][0] ?? null,
             'mbid_release' => $primary_meta_provider['musicbrainz_albumid'][0] ?? null,
-            'mbid_track' => $primary_meta_provider['musicbrainz_trackid'][0] ?? null,
+            'mbid_recording' => $primary_meta_provider['musicbrainz_trackid'][0] ?? null,
+            'mbid_track' => $primary_meta_provider['musicbrainz_releasetrackid'][0] ?? null,
         ];
 
         if (!is_numeric($meta['disk_number']))
@@ -186,7 +187,11 @@ foreach ($libs as $libinfo) {
 
         try {
             if ($mbid_release !== null) {
+                // ======= THERE ARE MusicBrainz Release Information ======
+
                 $releaseInfo = null;
+                // If cached, reuse release information,
+                // if not, get release info with mbid from API
                 if (isset($releaseInformationCache[$mbid_release]))
                     $releaseInfo = $releaseInformationCache[$mbid_release];
                 else {
@@ -197,11 +202,15 @@ foreach ($libs as $libinfo) {
                     $releaseInformationCache[$mbid_release] = $releaseInfo;
                 }
 
+                // If there are no release that match current mbid
+                // If exists, also put there ID to $dbalbum
                 if (($dbalbum = DB::queryFirstRow('SELECT id FROM releaseMetadata WHERE libraryId = %i AND releaseMbid = %s', $libinfo['id'], $mbid_release)) === null) {
+                    // Indicate Cover art archive path
                     $artworkPath = ($releaseInfo['cover-art-archive']['front'] ?? false) ?
                         'https://coverartarchive.org/release/' . $releaseInfo['id'] . '/front' :
                         null;
 
+                    // Put release info to DB
                     DB::insert('releaseMetadata', [
                         'libraryId' => $libinfo['id'],
                         'releaseMbid' => $releaseInfo['id'],
@@ -212,15 +221,21 @@ foreach ($libs as $libinfo) {
                         'disambiguation' => $releaseInfo['disambiguation'],
                     ]);
 
+                    // Put inserted ID to $dbalbum to reuse
                     $dbalbum = ['id' => DB::insertId()];
 
+                    // Put artist map info to DB
                     createArtistMetadataAndMap($releaseInfo['artist-credit'], $dbalbum['id'], null);
                 }
 
+                // If MusicBrainz track id information exits
                 if ($mbid_track !== null) {
+                    $found = false;
                     for ($diskno = 0; $diskno < count($releaseInfo['media']); $diskno++) {
+                        if ($found) break;
                         for ($trackno = 0; $trackno < count($releaseInfo['media'][$diskno]['tracks']); $trackno++) {
                             $trackInfo = $releaseInfo['media'][$diskno]['tracks'][$trackno];
+                            var_dump($trackInfo['id']);
                             if ($mbid_track === $trackInfo['id']) {
                                 DB::insert('track', [
                                     'libraryId' => $libinfo['id'],
@@ -236,10 +251,14 @@ foreach ($libs as $libinfo) {
                                 $insertedTrack = ['id' => DB::insertId()];
                                 createArtistMetadataAndMap($trackInfo['artist-credit'], null, $insertedTrack['id']);
                                 $id3HasArtistInfo = false;
+                                $found = true;
+                                break;
                             }
                         }
                     }
                 }
+
+                // ======= END of THERE ARE MusicBrainz Release Information ======
             } else if (isset($meta['album'])) {
                 $dbalbum = DB::queryFirstRow('SELECT id FROM releaseMetadata WHERE libraryId = %i AND title = %s', $libinfo['id'], $meta['album']);
                 if ($dbalbum === null) {
