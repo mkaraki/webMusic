@@ -60,7 +60,7 @@ function onTimeUpdate(time: number) {
 </script>
 
 <template>
-    <LibraryNavBar />
+    <LibraryNavBar v-on:navigate="displayPlaybackQueue = false" />
     <div class="queue-controller">
         <PlayingQueueController v-if="displayPlaybackQueue" :coverUrl="coverUrl" :playingNo="playingNo" :playlist="playlist"
             :current-time="playingTime" />
