@@ -235,7 +235,6 @@ foreach ($libs as $libinfo) {
                         if ($found) break;
                         for ($trackno = 0; $trackno < count($releaseInfo['media'][$diskno]['tracks']); $trackno++) {
                             $trackInfo = $releaseInfo['media'][$diskno]['tracks'][$trackno];
-                            var_dump($trackInfo['id']);
                             if ($mbid_track === $trackInfo['id']) {
                                 DB::insert('track', [
                                     'libraryId' => $libinfo['id'],
