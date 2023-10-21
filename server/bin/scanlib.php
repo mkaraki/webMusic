@@ -114,8 +114,10 @@ foreach ($libs as $libinfo) {
 
     foreach ($files as $fp) {
 
-        if ($processing_i++ >= 100)
+        if ($processing_i++ >= 100) {
             $releaseInformationCache = [];
+            $processing_i = 0;
+        }
 
         $lfp = strtolower($fp);
 
@@ -128,6 +130,9 @@ foreach ($libs as $libinfo) {
         }
 
         if ($discontinue === true)
+            continue;
+
+        if (count(DB::query('SELECT id FROM track WHERE libraryId = %i AND path = %s', $libinfo['id'], $fp)) !== 0)
             continue;
 
         $metadata = $gid3->analyze($fp);
@@ -176,9 +181,6 @@ foreach ($libs as $libinfo) {
 
 
         $id3HasArtistInfo = isset($meta['artist']);
-
-        if (count(DB::query('SELECT id FROM track WHERE libraryId = %i AND path = %s', $libinfo['id'], $fp)) !== 0)
-            continue;
 
         DB::startTransaction();
 
