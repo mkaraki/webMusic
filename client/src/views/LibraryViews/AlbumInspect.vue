@@ -82,9 +82,8 @@ onMounted(() => {
                     </p>
                     <div>
                         <div class="list-group">
-                            <a href="javascript:void(0)" class="list-group-item list-group-item-action"
-                                v-for="track in album['track']" :key="track['id']"
-                                v-on:click.prevent="playQueue(album['track'], track)">
+                            <span class="list-group-item list-group-item-action" v-for="track in album['track']"
+                                :key="track['id']">
                                 <div class="d-flex justify-content-between align-items-start w-100">
                                     <div class="me-auto track-information-holder">
                                         <div class="track-no-information-holder">
@@ -95,7 +94,10 @@ onMounted(() => {
                                         </div>
                                         <div>
                                             <div>
-                                                {{ track['title'] }}
+                                                <a href="javascript:void(0)"
+                                                    v-on:click.prevent="playQueue(album['track'], track)" class="trackName">
+                                                    {{ track['title'] }}
+                                                </a>
                                             </div>
                                             <div class="artist-information-holder">
                                                 <artist-map-to-linked-text
@@ -105,7 +107,7 @@ onMounted(() => {
                                     </div>
                                     <second-to-time-format :duration="parseInt(track['duration'])"></second-to-time-format>
                                 </div>
-                            </a>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -182,6 +184,11 @@ img {
 }
 
 .list-group-item {
+    color: white;
+}
+
+.trackName,
+.trackName:link {
     color: white;
 }
 </style>
