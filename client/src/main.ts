@@ -13,6 +13,8 @@ import LibraryMenu from './views/LibraryMenu.vue';
 import AlbumList from './views/LibraryViews/AlbumList.vue';
 import AlbumInspect from './views/LibraryViews/AlbumInspect.vue';
 import TrackList from './views/LibraryViews/TrackList.vue';
+import ArtistList from './views/LibraryViews/ArtistList.vue';
+import ArtistInspect from './views/LibraryViews/ArtistInspect.vue';
 
 const routes = [
     { path: '/', component: SelectLibrary },
@@ -35,7 +37,15 @@ const routes = [
             {
                 path: 'track/',
                 component: TrackList
-            }
+            },
+            {
+                path: 'artist/',
+                component: ArtistList
+            },
+            {
+                path: 'artist/:artistId/',
+                component: ArtistInspect
+            },
         ]
     },
 ]

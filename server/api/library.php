@@ -317,4 +317,119 @@ $klein->respond('GET', '/library/[i:libraryId]/album', function ($request, $resp
     $response->json($ret);
 });
 
+$klein->respond('GET', '/library/[i:libraryId]/artist', function ($request, $response) {
+    $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
+    if ($loggedUser === null) return;
+    if (!checkUserHavePermissionToReadLibrary($loggedUser, $request->libraryId)) {
+        $response->code(403);
+        return null;
+    }
+
+    $page = $request->paramsGet()['page'] ?? 1;
+    $res = DB::query(
+        'SELECT
+            a.artistId AS id,
+            a.dispName,
+            t.releaseId AS albumId,
+            rM.title AS albumTitle
+            FROM
+                track t,
+                releaseMetadata rM,
+                artistMap a
+            WHERE
+                t.libraryId = %i AND
+                t.releaseId = rM.id AND
+                a.trackId = t.id
+            GROUP BY a.artistId
+            ORDER BY a.artistId
+            LIMIT %i, 51
+            ',
+        $request->libraryId,
+        ($page - 1) * 50
+    );
+
+    for ($i = 0; $i < count($res); $i++) {
+        $res[$i]['artworkUrl'] = '/library/' . $request->libraryId . '/album/' . $res[$i]['albumId'] . '/artwork';
+    }
+
+    $ret = [
+        'result' => count($res) > 50 ? array_slice($res, 0, 50) : $res,
+        'next' => count($res) > 50 ? '/library/' . $request->libraryId . '/artwork?page=' . $page + 1 : null
+    ];
+
+    setCors($request, $response);
+    $response->json($ret);
+});
+
+$klein->respond('GET', '/library/[i:libraryId]/artist/[i:artistId]', function ($request, $response) {
+    $loggedUser = loginAndExtendTokenExpireWithKlein($request, $response);
+    if ($loggedUser === null) return;
+    if (!checkUserHavePermissionToReadLibrary($loggedUser, $request->libraryId)) {
+        $response->code(403);
+        return null;
+    }
+
+    $page = $request->paramsGet()['page'] ?? 1;
+    $res = DB::query(
+        'SELECT
+            a.dispName,
+            t.releaseId AS id,
+            rM.title AS albumName
+            FROM
+                track t,
+                releaseMetadata rM,
+                artistMap a
+            WHERE
+                t.libraryId = %i AND
+                a.artistId = %i AND
+                t.releaseId = rM.id AND
+                a.trackId = t.id
+            GROUP BY t.releaseId
+            ORDER BY a.releaseId
+            LIMIT %i, 51
+            ',
+        $request->libraryId,
+        $request->artistId,
+        ($page - 1) * 50
+    );
+
+    for ($i = 0; $i < count($res); $i++) {
+        $res[$i]['artist'] = DB::query(
+            'SELECT mapNo AS sequence, artistId, dispName, joinPhrase
+                FROM artistMap
+                WHERE releaseId = %i
+                ORDER BY mapNo',
+            $res[$i]['id']
+        );
+
+        $res[$i]['artworkUrl'] = '/library/' . $request->libraryId . '/album/' . $res[$i]['id'] . '/artwork';
+    }
+
+    $ret = [
+        'result' => count($res) > 50 ? array_slice($res, 0, 50) : $res,
+        'next' => count($res) > 50 ? '/library/' . $request->libraryId . '/artwork?page=' . $page + 1 : null
+    ];
+
+    if ($page === 1) {
+        $artistNames = DB::queryFirstColumn(
+            'SELECT DISTINCT
+                a.dispName
+                FROM
+                    artistMap a
+                WHERE
+                    a.artistId = %i
+                ORDER BY a.dispName
+                LIMIT 20
+            ',
+            $request->artistId,
+        );
+
+        $ret['info'] = [];
+        $ret['info']['artistNames'] = $artistNames;
+    }
+
+    setCors($request, $response);
+    $response->json($ret);
+});
+
 require_once(__DIR__ . '/library_file_bridge.php');

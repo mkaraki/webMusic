@@ -33,7 +33,7 @@ $klein->respond('/[|app:entry]', function ($request, $response) {
 
 $klein->respond('GET', '/version', function ($request, $response) {
     $response->json(array(
-        'api' => 2023_10_21_00001
+        'api' => 2023_10_21_00002
     ));
 });
 

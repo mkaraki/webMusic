@@ -26,11 +26,11 @@ const emit = defineEmits(['navigate']);
                             Album
                         </RouterLink>
                     </li>
-                    <!--<li class="nav-item">
+                    <li class="nav-item">
                         <RouterLink :to="`/library/${libraryId}/artist/`" class="nav-link" v-on:click="emit('navigate')">
                             Artists
                         </RouterLink>
-                    </li>-->
+                    </li>
                     <li class="nav-item">
                         <RouterLink :to="`/library/${libraryId}/track/`" class="nav-link" v-on:click="emit('navigate')">
                             Tracks

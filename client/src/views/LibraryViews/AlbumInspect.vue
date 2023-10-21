@@ -84,7 +84,7 @@ onMounted(() => {
                         <div class="list-group">
                             <a href="javascript:void(0)" class="list-group-item list-group-item-action"
                                 v-for="track in album['track']" :key="track['id']"
-                                v-on:click="playQueue(album['track'], track)">
+                                v-on:click.prevent="playQueue(album['track'], track)">
                                 <div class="d-flex justify-content-between align-items-start w-100">
                                     <div class="me-auto track-information-holder">
                                         <div class="track-no-information-holder">
