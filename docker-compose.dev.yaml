@@ -24,3 +24,5 @@ services:
       - MARIADB_DATABASE=webmusic
       - MARIADB_USER=webmusic
       - MARIADB_PASSWORD=secret_password
+    ports:
+      - 7071:3306
