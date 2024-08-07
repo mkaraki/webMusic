@@ -39,6 +39,7 @@ function tryLoginWithServerAddress(baseurl: string) {
                     console.log(json);
                     if (json['loggedUser'] !== undefined) {
                         baseUrl.value = baseurl;
+                        formServerUrl.value = baseurl;
                         localStorage.setItem('lastConnectedServer', baseurl);
                         emit('loginSucceed', baseurl);
                     }
@@ -48,6 +49,8 @@ function tryLoginWithServerAddress(baseurl: string) {
                 });
             }
             else if (response.status === 401) {
+                baseUrl.value = baseurl;
+                formServerUrl.value = baseurl;
                 serverSelected.value = true;
             }
             else {
