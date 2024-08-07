@@ -47,7 +47,7 @@ $klein->respond('POST', '/setup/createuser', function ($request, $response, $ser
         'permission' => 0 # Permission 0: Administrator
     ]);
 
-    if ($result !== true) {
+    if ($result !== 1) {
         $response->code(500);
         return 'error';
     } else {
