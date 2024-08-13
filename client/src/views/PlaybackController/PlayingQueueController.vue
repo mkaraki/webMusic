@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import { emitter } from "../../emitter";
 import ArtistMapToLinkedText from '../../components/ArtistMapToLinkedText.vue';
 import SecondToTimeFormat from '../../components/SecondToTimeFormat.vue';
 import LyricView from './LyricView.vue';
 
-defineProps<{
+const prop = defineProps<{
     coverUrl: string,
     playlist: Array<any>,
     playingNo: number,
@@ -30,6 +30,12 @@ function playQueue(trackList: Array<any>, track: number) {
 emitter.on('setPlaylistNo', (i :any) => {
     const no = i['no'];
     document.getElementById(`playlist-${no}`)?.scrollIntoView(true);
+});
+
+onMounted(() => {
+    setTimeout(() => {
+        document.getElementById(`playlist-${prop.playingNo}`)?.scrollIntoView(true);
+    }, 500);
 });
 
 const tabMode = ref('playlist');
