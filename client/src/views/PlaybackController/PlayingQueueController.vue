@@ -27,6 +27,11 @@ function playQueue(trackList: Array<any>, track: number) {
     sendSelectedTrackInfo(trackData['id']);
 }
 
+emitter.on('setPlaylistNo', (i :any) => {
+    const no = i['no'];
+    document.getElementById(`playlist-${no}`)?.scrollIntoView(true);
+});
+
 const tabMode = ref('playlist');
 
 </script>
@@ -65,7 +70,7 @@ const tabMode = ref('playlist');
                                         <div class="list-group">
                                             <div :class="'list-group-item ' + (playingNo === index ? 'active' : 'list-group-item-action')"
                                                 v-for="(track, index) in playlist" :key="track['id']">
-                                                <div class="d-flex justify-content-between align-items-start w-100">
+                                                <div class="d-flex justify-content-between align-items-start w-100" :id="`playlist-${index}`">
                                                     <div class="me-auto track-information-holder">
                                                         <div class="track-no-information-holder">
                                                             {{ index + 1 }}.

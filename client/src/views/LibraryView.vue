@@ -21,6 +21,7 @@ emitter.on('setPlaylist', (i: any) => {
     console.info('New playlist: ', i)
     playlist.value = i['list'];
     playingNo.value = i['playing'];
+    emitter.emit('setPlaylistNo', {'no': playingNo.value});
 });
 
 emitter.on('setDisplayPlaybackQueue', (i: any) => {
@@ -41,10 +42,12 @@ const baseurl = baseurlGetter();
 function playbackEnded(isLoop: boolean = false) {
     if (playingNo.value + 1 < playlist.value.length) {
         playingNo.value++;
+        emitter.emit('setPlaylistNo', {'no': playingNo.value});
         emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
         return;
     }
     else if (isLoop) {
+        emitter.emit('setPlaylistNo', {'no': playingNo.value});
         emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
         return;
     }
@@ -57,6 +60,7 @@ function playbackEnded(isLoop: boolean = false) {
                 console.log(playlist.value, data)
                 playlist.value = playlist.value.concat(data);
                 playingNo.value++;
+                emitter.emit('setPlaylistNo', {'no': playingNo.value});
                 emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
             });
     }
