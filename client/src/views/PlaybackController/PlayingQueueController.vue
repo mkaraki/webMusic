@@ -63,18 +63,18 @@ const tabMode = ref('playlist');
                                     </div>
                                     <div v-else>
                                         <div class="list-group">
-                                            <a href="javascript:void(0)"
-                                                :class="'list-group-item ' + (playlist[playingNo]['id'] === track['id'] ? 'active' : 'list-group-item-action')"
-                                                v-for="(track, index) in playlist" :key="track['id']"
-                                                v-on:click="playQueue(playlist, track)">
+                                            <div :class="'list-group-item ' + (playlist[playingNo]['id'] === track['id'] ? 'active' : 'list-group-item-action')"
+                                                v-for="(track, index) in playlist" :key="track['id']">
                                                 <div class="d-flex justify-content-between align-items-start w-100">
                                                     <div class="me-auto track-information-holder">
                                                         <div class="track-no-information-holder">
                                                             {{ index + 1 }}.
                                                         </div>
                                                         <div>
-                                                            <div>
-                                                                {{ track['title'] }}
+                                                            <div class="track-name-information-holder">
+                                                                <a href="javascript:void(0)" v-on:click="playQueue(playlist, track)" class="text-white">
+                                                                    {{ track['title'] }}
+                                                                </a>
                                                             </div>
                                                             <div class="artist-information-holder">
                                                                 <artist-map-to-linked-text :artists="track['artist']">
@@ -85,7 +85,7 @@ const tabMode = ref('playlist');
                                                     <second-to-time-format :duration="parseInt(track['duration'])">
                                                     </second-to-time-format>
                                                 </div>
-                                            </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -202,5 +202,9 @@ div:has(.playing-control-container-toggler) {
     background-color: rgba(47, 47, 118, 0.5);
     border: lightskyblue 1px solid;
     z-index: 1;
+}
+
+.track-name-information-holder {
+    color: white;
 }
 </style>
