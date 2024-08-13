@@ -39,13 +39,12 @@ const baseurlGetter: any = inject('baseurl');
 const baseurl = baseurlGetter();
 
 function playbackEnded(isLoop: boolean = false) {
-    playingNo.value++;
-
-    if (playingNo.value < playlist.value.length) {
+    if (playingNo.value + 1 < playlist.value.length) {
+        playingNo.value++;
         emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
+        return;
     }
     else if (isLoop) {
-        playingNo.value = 0;
         emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
         return;
     }
@@ -55,7 +54,9 @@ function playbackEnded(isLoop: boolean = false) {
         })
             .then(data => data.json())
             .then(data => {
+                console.log(playlist.value, data)
                 playlist.value = playlist.value.concat(data);
+                playingNo.value++;
                 emitter.emit('newTrackSelected', playlist.value[playingNo.value]['id']);
             });
     }
