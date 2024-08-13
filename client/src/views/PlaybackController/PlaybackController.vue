@@ -7,7 +7,11 @@ const route = useRoute();
 
 const libraryId = route.params.libraryId;
 
-const emit = defineEmits(['togglePlaybackQueue', 'playbackEnded', 'onTimeUpdate']);
+const emit = defineEmits<{
+    togglePlaybackQueue: [];
+    playbackEnded: [isLoop: boolean];
+    onTimeUpdate: [time: number];
+}>();
 
 const baseurlGetter: any = inject('baseurl');
 const baseurl = baseurlGetter();
