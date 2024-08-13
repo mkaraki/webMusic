@@ -23,6 +23,13 @@ emitter.on('setPlaylist', (i: any) => {
     playingNo.value = i['playing'];
 });
 
+emitter.on('setDisplayPlaybackQueue', (i: any) => {
+    if (i['show'] === undefined)
+        displayPlaybackQueue.value = !displayPlaybackQueue.value;
+    else
+        displayPlaybackQueue.value = i['show'];
+})
+
 const playingTime = ref(0.0);
 
 const playlist = ref([]);

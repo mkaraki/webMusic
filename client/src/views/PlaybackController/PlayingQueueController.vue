@@ -76,9 +76,9 @@ const tabMode = ref('playlist');
                                                                     {{ track['title'] }}
                                                                 </a>
                                                             </div>
-                                                            <div class="artist-information-holder">
-                                                                <artist-map-to-linked-text :artists="track['artist']">
-                                                                </artist-map-to-linked-text>
+                                                            <div class="artist-information-holder"
+                                                                v-on:click="console.log('Go artist'); emitter.emit('setDisplayPlaybackQueue', { 'show': false })">
+                                                                <artist-map-to-linked-text :artists="track['artist']" />
                                                             </div>
                                                         </div>
                                                     </div>
