@@ -16,15 +16,15 @@ function sendSelectedTrackInfo(trackId: number) {
     emitter.emit<any>('newTrackSelected', trackId)
 }
 
-function playQueue(trackList: Array<any>, track: any) {
-    const playingNo = trackList.findIndex(v => v['id'] === track['id']);
+function playQueue(trackList: Array<any>, track: number) {
+    const trackData = trackList[track];
 
     emitter.emit('setPlaylist', {
         'list': trackList,
-        'playing': playingNo,
+        'playing': track,
     });
 
-    sendSelectedTrackInfo(track['id']);
+    sendSelectedTrackInfo(trackData['id']);
 }
 
 const tabMode = ref('playlist');
@@ -63,7 +63,7 @@ const tabMode = ref('playlist');
                                     </div>
                                     <div v-else>
                                         <div class="list-group">
-                                            <div :class="'list-group-item ' + (playlist[playingNo]['id'] === track['id'] ? 'active' : 'list-group-item-action')"
+                                            <div :class="'list-group-item ' + (playingNo === index ? 'active' : 'list-group-item-action')"
                                                 v-for="(track, index) in playlist" :key="track['id']">
                                                 <div class="d-flex justify-content-between align-items-start w-100">
                                                     <div class="me-auto track-information-holder">
@@ -72,7 +72,7 @@ const tabMode = ref('playlist');
                                                         </div>
                                                         <div>
                                                             <div class="track-name-information-holder">
-                                                                <a href="javascript:void(0)" v-on:click="playQueue(playlist, track)" class="text-white">
+                                                                <a href="javascript:void(0)" v-on:click="playQueue(playlist, index)" class="text-white">
                                                                     {{ track['title'] }}
                                                                 </a>
                                                             </div>
