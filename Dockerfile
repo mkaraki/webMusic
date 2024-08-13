@@ -49,7 +49,7 @@ SetEnv CORS_ORIGIN \${CORS_ORIGIN}
 EOF
 
 COPY --from=require-server /app/vendor /var/www/html/vendor
-COPY --from=build-webapp /app/dist /var/www/html/public
+COPY --from=build-webapp /app/dist /var/www/html/app
 
 COPY server/.htaccess /var/www/html/
 COPY server/index.php /var/www/html/
