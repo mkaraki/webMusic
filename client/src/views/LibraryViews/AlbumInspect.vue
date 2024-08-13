@@ -17,7 +17,7 @@ const libraryId = route.params.libraryId;
 const albumId = route.params.albumId;
 const album: Ref<any> = ref(null);
 
-const loading = ref(false);
+const loading = ref(true);
 
 function addItemsRecursive(url: string) {
     fetch(baseurl + url, {
@@ -69,7 +69,7 @@ onMounted(() => {
 
 <template>
     <Loading v-if="loading" />
-    <div v-else class="holder" :style="{ '--bgImage': 'url(' + baseurl + album['artworkUrl'] + ')' }">
+    <div v-else class="holder" :style="{ '--bgImage': 'url(' + baseurl + (album['artworkUrl']) + ')' }">
         <div class="container-fluid">
             <div class="row coverart-bg">
                 <div class="col-12 col-md-4 text-center">
