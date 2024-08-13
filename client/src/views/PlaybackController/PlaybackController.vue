@@ -225,7 +225,7 @@ function saveVolume(event: any) {
 <style scoped>
 .controller-playback-position-holder {
     height: 5px;
-    padding-bottom: 0px;
+    padding-bottom: 0;
     cursor: pointer;
 }
 
@@ -243,7 +243,7 @@ function saveVolume(event: any) {
 .controller-playback-position-indicator {
     position: relative;
     height: 100%;
-    width: 0%;
+    width: 0;
     background-color: #999;
     overflow: hidden;
 }
@@ -267,6 +267,17 @@ function saveVolume(event: any) {
     height: 100%;
     width: 100%;
     object-fit: contain;
+}
+
+.controller-playback-mediainfo-title {
+  color: white;
+  font-size: x-large;
+  margin-bottom: -4px !important;
+}
+
+.controller-playback-mediainfo-from {
+  font-size: smaller;
+  color: darkgray
 }
 
 .controller-playback-mediainfo-text-holder {
@@ -302,16 +313,6 @@ function saveVolume(event: any) {
     }
 }
 
-.controller-playback-mediainfo-title {
-    color: white;
-    font-size: x-large;
-}
-
-.controller-playback-mediainfo-from {
-    font-size: smaller;
-    color: darkgray
-}
-
 
 
 .controller-playback-control-holder {
@@ -333,7 +334,6 @@ function saveVolume(event: any) {
 .controller-playback-control-volume-holder {
     float: left;
     display: none;
-    position: abosolute;
     margin-top: 18px;
     height: 10px;
 }
@@ -361,7 +361,6 @@ function saveVolume(event: any) {
     }
 
     .controller-playback-control-holder {
-        margin-right: 0;
         margin: auto;
         text-align: center;
     }
