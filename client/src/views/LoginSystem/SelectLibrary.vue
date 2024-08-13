@@ -38,6 +38,9 @@ onMounted(() => {
 <template>
     <Loading v-if="loading" />
     <div v-else class="container-fluid">
+        <div class="row">
+            <h1>Libraries</h1>
+        </div>
         <div class="row row-cols-2 row-cols-sm-2 row-cols-md-6 row-cols-lg-6 row-cols-xl-6 row-cols-xxl12 g-6">
             <div class="col">
                 <div class="card h-100" v-for="library in availLibraries" :key="library['id']">
