@@ -1,0 +1,783 @@
+openapi: 3.0.3
+info:
+  title: webMusic API
+  version: 2023.10.21.00002
+
+
+paths:
+  /version:
+    get:
+      summary: Get API version
+      responses:
+        200:
+          description: returns API version
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  api:
+                    type: integer
+                    format: int64
+                    example: 2023_10_21_00002
+  /login:
+    post:
+      summary: Get login token
+      responses:
+        401:
+          description: Failed to auth
+        200:
+          description: returns API token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    format: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+
+  /login/check:
+    get:
+      summary: Check browser logged in or not
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  loggedUser:
+                    type: string
+                    format: string
+                    description: Logged user's name
+        401:
+          description: Not logged in
+
+  /history:
+    post:
+      security:
+        - cookieAuth: []
+      summary: Send listen history to registered scrobble services
+      responses:
+        400:
+          description: No such track exists
+        401:
+          description: Not logged in
+        200:
+          description: Successfully scrobbled
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                  description: Track Id
+
+  /library:
+    get:
+      summary: Get all accessible libraries
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: Returns list of available libraries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                      description: Library Id
+                    name:
+                      type: string
+                      format: string
+                      description: Library Name
+        401:
+          description: Not logged in
+
+  /library/{libraryId}/check:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Check library accessible or not
+      parameters:
+        - name: libraryId
+          in: path
+          description: Library Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        401:
+          description: Not logged in
+        204:
+          description: Can access
+        403:
+          description: User doesn't have permission
+
+  /library/{libraryId}/track:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get library tracks
+      parameters:
+        - name: libraryId
+          in: path
+          description: Library Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          description: track list page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: in64
+            minimum: 1
+      responses:
+        401:
+          description: Not logged in
+        403:
+          description: User doesn't have permission
+        200:
+          description: Track list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: track Id
+                        mbid:
+                          type: string
+                          format: uuid
+                          description: track MusicBrainz Id
+                        title:
+                          type: string
+                          description: track Title
+                        duration:
+                          type: integer
+                          format: seconds
+                          description: track duration in seconds
+                        diskNo:
+                          type: integer
+                          description: disk no which tracks belong to
+                        trackNo:
+                          type: integer
+                          description: track no in disk
+                        releaseId:
+                          type: integer
+                          description: album Id
+                        albumName:
+                          type: string
+                          description: album name
+                        artist:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              sequence:
+                                type: integer
+                                description: index if artist info
+                              artistId:
+                                type: integer
+                                description: artist id
+                              dispName:
+                                type: string
+                                description: display name of artist. Just fot this track. Not artist globally.
+                              joinPhrase:
+                                type: string
+                                description: string after artist name for join two or more artist in several ways.
+                        artworkUrl:
+                          type: string
+                          format: url
+                          description: artwork Url
+                  next:
+                    description: Next page of track list URL
+                    type: string
+                    format: path
+                    nullable: true
+
+  /library/{libraryId}/track/{trackId}:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get library tracks
+      parameters:
+        - name: libraryId
+          in: path
+          description: Library Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackId
+          in: path
+          description: Track Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        401:
+          description: Not logged in
+        403:
+          description: User doesn't have permission
+        200:
+          description: Track list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: track Id
+                  mbid:
+                    type: string
+                    format: uuid
+                    description: track MusicBrainz Id
+                  title:
+                    type: string
+                    description: track Title
+                  duration:
+                    type: integer
+                    format: seconds
+                    description: track duration in seconds
+                  diskNo:
+                    type: integer
+                    description: disk no which tracks belong to
+                  trackNo:
+                    type: integer
+                    description: track no in disk
+                  albumName:
+                    type: string
+                    description: album name
+                  artist:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        sequence:
+                          type: integer
+                          description: index if artist info
+                        artistId:
+                          type: integer
+                          description: artist id
+                        dispName:
+                          type: string
+                          description: display name of artist. Just fot this track. Not artist globally.
+                        joinPhrase:
+                          type: string
+                          description: string after artist name for join two or more artist in several ways.
+                  artworkUrl:
+                    type: string
+                    format: url
+                    description: artwork Url
+                  artistString:
+                    type: string
+                    description: flatten artist name
+
+  /library/{libraryId}/album:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get library albums
+      parameters:
+        - name: libraryId
+          in: path
+          description: Library Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          description: album list page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: in64
+            minimum: 1
+      responses:
+        401:
+          description: Not logged in
+        403:
+          description: User doesn't have permission
+        200:
+          description: Album list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: track Id
+                        albumName:
+                          type: string
+                          description: album name
+                        artworkUrl:
+                          type: string
+                          format: url
+                          description: artwork Url
+                        artist:
+                          type: array
+                          description: Album artist
+                          items:
+                            type: object
+                            properties:
+                              sequence:
+                                type: integer
+                                description: index if artist info
+                              artistId:
+                                type: integer
+                                description: artist id
+                              dispName:
+                                type: string
+                                description: display name of artist. Just fot this track. Not artist globally.
+                              joinPhrase:
+                                type: string
+                                description: string after artist name for join two or more artist in several ways.
+                  next:
+                    description: Next page of track list URL
+                    type: string
+                    format: path
+                    nullable: true
+
+  /library/{libraryId}/album/{albumId}:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get library tracks
+      parameters:
+        - name: libraryId
+          in: path
+          description: Library Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: albumId
+          in: path
+          description: Album Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        401:
+          description: Not logged in
+        403:
+          description: User doesn't have permission
+        200:
+          description: Track list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: track Id
+                  albumName:
+                    type: string
+                    description: album name
+                  artworkUrl:
+                    type: string
+                    format: url
+                    description: artwork Url
+                  artist:
+                    type: array
+                    description: Album artist
+                    items:
+                      type: object
+                      properties:
+                        sequence:
+                          type: integer
+                          description: index if artist info
+                        artistId:
+                          type: integer
+                          description: artist id
+                        dispName:
+                          type: string
+                          description: display name of artist. Just fot this track. Not artist globally.
+                        joinPhrase:
+                          type: string
+                          description: string after artist name for join two or more artist in several ways.
+                  track:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: track Id
+                        mbid:
+                          type: string
+                          format: uuid
+                          description: track MusicBrainz Id
+                        title:
+                          type: string
+                          description: track Title
+                        duration:
+                          type: integer
+                          format: seconds
+                          description: track duration in seconds
+                        diskNo:
+                          type: integer
+                          description: disk no which tracks belong to
+                        trackNo:
+                          type: integer
+                          description: track no in disk
+                        artist:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              sequence:
+                                type: integer
+                                description: index if artist info
+                              artistId:
+                                type: integer
+                                description: artist id
+                              dispName:
+                                type: string
+                                description: display name of artist. Just fot this track. Not artist globally.
+                              joinPhrase:
+                                type: string
+                                description: string after artist name for join two or more artist in several ways.
+
+  /library/{libraryId}/artist:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get library artists
+      parameters:
+        - name: libraryId
+          in: path
+          description: Library Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          description: artist list page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: in64
+            minimum: 1
+      responses:
+        401:
+          description: Not logged in
+        403:
+          description: User doesn't have permission
+        200:
+          description: Artist joined album list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: artist Id
+                        albumName:
+                          type: string
+                          description: general artist name
+                        albumId:
+                          type: integer
+                          format: int64
+                          description: album id
+                        albumTitle:
+                          type: string
+                          format: string
+                          description: album Name
+                        artworkUrl:
+                          type: string
+                          format: url
+                          description: artwork Url
+                  next:
+                    description: Next page of track list URL
+                    type: string
+                    format: path
+                    nullable: true
+
+  /library/{libraryId}/artist/{artistId}:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get artist joined albums
+      parameters:
+        - name: libraryId
+          in: path
+          description: Library Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: artistId
+          in: path
+          description: artist Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        401:
+          description: Not logged in
+        403:
+          description: User doesn't have permission
+        200:
+          description: artist joined albums
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  res:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        dispName:
+                          type: string
+                          description: artist display name in album
+                        id:
+                          type: integer
+                          description: release Id
+                        albumName:
+                          type: string
+                          description: album name
+                        artworkUrl:
+                          type: string
+                          format: url
+                          description: artwork Url
+                        artist:
+                          type: array
+                          description: Album artist
+                          items:
+                            type: object
+                            properties:
+                              sequence:
+                                type: integer
+                                description: index if artist info
+                              artistId:
+                                type: integer
+                                description: artist id
+                              dispName:
+                                type: string
+                                description: display name of artist. Just fot this track. Not artist globally.
+                              joinPhrase:
+                                type: string
+                                description: string after artist name for join two or more artist in several ways.
+                  next:
+                    description: Next page of track list URL
+                    type: string
+                    format: path
+                    nullable: true
+                  info:
+                    description: Artist Info
+                    type: object
+                    nullable: true
+                    properties:
+                      artistNames:
+                        type: array
+                        description: All of artist display name
+                        items:
+                          type: string
+
+  /library/{libraryId}/track/{trackId}/file:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get track file (raw file)
+      parameters:
+        - name: libraryId
+          in: path
+          description: Library Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackId
+          in: path
+          description: Track Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        401:
+          description: Not logged in
+        403:
+          description: User doesn't have permission
+        200:
+          description: Track content
+
+  /library/{libraryId}/track/{trackId}/lyric:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get track file (raw file)
+      parameters:
+        - name: libraryId
+          in: path
+          description: Library Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackId
+          in: path
+          description: Track Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        401:
+          description: Not logged in
+        403:
+          description: User doesn't have permission
+        200:
+          description: Track content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lines:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        time:
+                          type: integer
+                          format: milliseconds
+                          description: Line start time in ms
+                        endtime:
+                          type: integer
+                          format: milliseconds
+                          description: Line end time in ms
+                        sections:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              time:
+                                type: integer
+                                format: milliseconds
+                                description: Line start time in ms
+                              endtime:
+                                type: integer
+                                format: milliseconds
+                                description: Line end time in ms
+                              text:
+                                type: string
+                                format: string
+                                description: lyric section text
+
+  /library/{libraryId}/track/{trackId}/artwork:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get track artwork image
+      parameters:
+        - name: libraryId
+          in: path
+          description: Library Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackId
+          in: path
+          description: Track Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        401:
+          description: Not logged in
+        403:
+          description: User doesn't have permission
+        200:
+          description: Artwork image
+
+  /library/{libraryId}/album/{albumId}/artwork:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get album artwork image
+      parameters:
+        - name: libraryId
+          in: path
+          description: Library Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: albumId
+          in: path
+          description: Album Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        401:
+          description: Not logged in
+        403:
+          description: User doesn't have permission
+        200:
+          description: Artwork image
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: auth
