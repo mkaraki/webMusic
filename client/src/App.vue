@@ -20,3 +20,7 @@ provide('baseurl', function () {
   <login v-if="srvbaseurl === ''" v-on:login-succeed="srvbaseurl = $event" />
   <RouterView v-else />
 </template>
+
+<style lang="scss">
+@import "./style.scss";
+</style>

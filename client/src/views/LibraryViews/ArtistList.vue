@@ -30,7 +30,7 @@ onMounted(() => {
 
 <template>
     <div class="container-fluid">
-        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-6 row-cols-lg-6 row-cols-xl-6 row-cols-xxl12 g-6">
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-6 row-cols-lg-6 row-cols-xl-6 row-cols-xxl12 g-4">
             <div class="col" v-for="item in items" :key="item['id']">
                 <div class="card h-100">
                     <RouterLink :to="`/library/${libraryId}/artist/${item['id']}`">
@@ -62,6 +62,10 @@ onMounted(() => {
 
 .card-img-top {
     width: 100%;
+}
+
+.card-title a {
+    color: white;
 }
 
 .card,
