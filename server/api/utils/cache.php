@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '../../../_config.php';
+require_once __DIR__ . '/../../_config.php';
 
 function isFileInTransformedStore(string $name): bool
 {
@@ -17,7 +17,4 @@ function writeFileToTransformedStore(string $name, string $content)
 {
     global $transformedFileDir;
     file_put_contents($transformedFileDir . '/' . $name, $content);
-    try {
-    } catch (Error) {
-    }
 }
