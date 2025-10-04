@@ -76,8 +76,8 @@ onMounted(() => {
                     <img :src="baseurl + album['artworkUrl']" alt="Artwork" class="img-fluid w-100">
                 </div>
                 <div class="col-12 col-md-8 content-info">
-                    <h2>{{ album['albumName'] }}</h2>
-                    <p class="artist-information-holder">
+                    <h2 class="display-6">{{ album['albumName'] }}</h2>
+                    <p class="artist-information-holder album-artist-information-holder">
                         <artist-map-to-linked-text :artists="album['artist']"></artist-map-to-linked-text>
                     </p>
                     <div>
@@ -184,6 +184,10 @@ img {
 .artist-information-holder {
     font-size: 10pt;
     color: darkgray;
+}
+
+.album-artist-information-holder {
+    font-size: 13pt;
 }
 
 .list-group-item {
