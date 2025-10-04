@@ -51,7 +51,7 @@ onMounted(() => {
                     </RouterLink>
                     <div class="card-body">
                         <h5 class="card-title cut-overflow card-album">
-                            <RouterLink :to="`/library/${libraryId}/album/${item['id']}`" class="list-group-item-action">
+                            <RouterLink :to="`/library/${libraryId}/album/${item['id']}`" class="list-group-item-action text-white">
                                 {{ item['albumName'] }}
                             </RouterLink>
                         </h5>
