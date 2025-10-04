@@ -129,7 +129,7 @@ body {
 .container-fluid {
     overflow: hidden;
     position: relative;
-    min-height: 100%;
+    height: 100%;
 }
 
 .container-fluid:before {
@@ -163,11 +163,14 @@ img {
 
 .row {
     height: 100%;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 .content-info {
     margin-top: 40px;
+    padding-bottom: 40px;
+    overflow: auto;
+    height: calc(100% - 40px);
 }
 
 .track-information-holder>div {
